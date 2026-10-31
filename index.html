@@ -1,11 +1,1415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Shot List برای کریتیو دولوپرها — زبان سینما در Three.js و GSAP</title>
+  <meta name="description" content="مرجع تعاملی فارسی سری The Shot List از StudioBinder: اندازه نما، کادربندی، زاویه، عمق میدان، ریگ، حرکت دوربین، لنز، فریم‌ریت، ترنزیشن و تدوین — با معادل کد در Three.js، GSAP، CSS و GLSL." />
+  <meta name="theme-color" content="#0a0b0f" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
 </head>
 <body>
-    
+  <div class="progress"></div>
+  <button class="menu-btn" type="button" aria-label="منو">☰</button>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">SL</div>
+      <div><b>The Shot List</b><small>زبان سینما برای کریتیو دولوپر</small></div>
+    </div>
+    <nav>
+      <ul class="toc">
+        <li><a href="#intro"><span class="n">00</span>مقدمه و نقشه‌ی راه</a></li>
+        <li><a href="#foundation"><span class="n">⚙</span>پایه‌ی کد: دوربین مجازی</a></li>
+        <li class="toc-group">قسمت‌های سری</li>
+        <li><a href="#shot-sizes"><span class="n">01</span>اندازه نما<span class="en">Sizes</span></a></li>
+        <li><a href="#framing"><span class="n">02</span>کادربندی<span class="en">Framing</span></a></li>
+        <li><a href="#angles"><span class="n">03</span>زاویه دوربین<span class="en">Angles</span></a></li>
+        <li><a href="#dof"><span class="n">04</span>عمق میدان<span class="en">DOF</span></a></li>
+        <li><a href="#rigs"><span class="n">05</span>ریگ و تجهیزات<span class="en">Rigs</span></a></li>
+        <li><a href="#movement"><span class="n">06</span>حرکت دوربین<span class="en">Movement</span></a></li>
+        <li><a href="#lenses"><span class="n">07</span>لنزها<span class="en">Lenses</span></a></li>
+        <li><a href="#framerate"><span class="n">08</span>فریم‌ریت و شاتر<span class="en">FPS</span></a></li>
+        <li><a href="#transitions"><span class="n">09</span>ترنزیشن‌ها<span class="en">Transitions</span></a></li>
+        <li><a href="#editing"><span class="n">10</span>تدوین<span class="en">Editing</span></a></li>
+        <li class="toc-group">جمع‌بندی</li>
+        <li><a href="#shotlist-code"><span class="n">★</span>شات‌لیست به‌عنوان داده</a></li>
+        <li><a href="#cheatsheet"><span class="n">≡</span>چیت‌شیت فیلم ← کد</a></li>
+        <li><a href="#sources"><span class="n">↗</span>منابع</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="wrap">
+
+      <!-- ===================== HERO ===================== -->
+      <header class="hero">
+        <div class="kicker">STUDIOBINDER · THE SHOT LIST · FOR CREATIVE DEVELOPERS</div>
+        <h1>زبان سینما، <span>به زبان کد</span></h1>
+        <p>
+          این سند مرجعی تعاملی بر اساس سری آموزشی <b>The Shot List</b> از کانال StudioBinder است؛ ده قسمت درباره‌ی
+          اندازه نما، کادربندی، زاویه، عمق میدان، ریگ، حرکت دوربین، لنز، فریم‌ریت، ترنزیشن و تدوین.
+          هر مفهوم از نگاه یک <b>کریتیو دولوپر</b> بررسی شده است: هدف آن چیست، چه حسی می‌سازد، کجا در وب و
+          تجربه‌های تعاملی به کار می‌آید، و <b>دقیقاً با چه کدی</b> در Three.js، GSAP، CSS یا GLSL پیاده می‌شود.
+        </p>
+        <div class="hero-meta">
+          <span class="pill"><b>۱۰</b> قسمت</span>
+          <span class="pill"><b>۱۱</b> دموی تعاملی زنده</span>
+          <span class="pill">Three.js · GSAP · GLSL · CSS · Web Audio</span>
+          <span class="pill">همه‌ی صحنه‌ها با واحد <b>متر</b> و لنز <b>فول‌فریم</b></span>
+        </div>
+      </header>
+
+      <!-- ===================== INTRO ===================== -->
+      <section id="intro" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">00 · INTRODUCTION</span>
+          <h2>چرا یک دولوپر باید سینما بداند؟</h2>
+          <p class="lead">
+            هر سین Three.js یک فیلم‌برداری است، هر اسکرول یک حرکت دوربین، و هر تغییر صفحه یک «کات».
+            فیلم‌سازها صد سال است که روی این سؤال کار کرده‌اند: <b>چطور نگاه مخاطب را هدایت کنیم و به او حس بدهیم؟</b>
+            وقتی واژگان سینما را بلد باشید، به‌جای «دوربین را یک‌کم ببر جلو» می‌گویید «یک Push-in آرام با لنز ۵۰ تا MCU» و دقیقاً می‌دانید چه کدی بنویسید.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف این سند</h4><p>تبدیل هر اصطلاح سینمایی به یک «الگوی کد» قابل استفاده؛ مرجعی که هنگام طراحی سین، موشن یا ترنزیشن کنار دستتان باشد.</p></div>
+          <div class="card use"><div class="icon">🧭</div><h4>چطور بخوانیم</h4><p>هر فصل: تعریف ← جدول انواع ← دموی زنده ← معادل کد (تب‌ها) ← نکته‌ها و اشتباهات رایج. دموها را حتماً لمس کنید.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>ابزارها</h4><p><b>Three.js</b> برای دوربین و صحنه، <b>GSAP</b> برای زمان و حرکت، <b>GLSL</b> برای جلوه‌ها، <b>CSS/Web APIs</b> برای UI.</p></div>
+        </div>
+
+        <h3>نقشه‌ی ذهنی: دوربین سینما در برابر دوربین مجازی</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>مفهوم سینمایی</th><th>در دنیای واقعی</th><th>معادل در کد</th></tr></thead>
+            <tbody>
+              <tr><td>بدنه‌ی دوربین<span class="en-term">Camera body</span></td><td>جایی که دوربین هست و به کجا نگاه می‌کند</td><td><code>camera.position</code> · <code>camera.lookAt()</code> · <code>quaternion</code></td></tr>
+              <tr><td>لنز<span class="en-term">Lens / Focal length</span></td><td>زاویه‌ی دید، پرسپکتیو، اعوجاج</td><td><code>camera.setFocalLength(mm)</code> · <code>camera.fov</code> · <code>filmGauge</code></td></tr>
+              <tr><td>اندازه نما<span class="en-term">Shot size</span></td><td>فاصله‌ی دوربین تا سوژه + لنز</td><td><code>d = (h/2) / tan(fov/2)</code></td></tr>
+              <tr><td>کادربندی<span class="en-term">Composition</span></td><td>جای سوژه در قاب</td><td><code>camera.setViewOffset()</code> · CSS Grid · <code>object-position</code></td></tr>
+              <tr><td>ریگ<span class="en-term">Rig / Support</span></td><td>سه‌پایه، دالی، استدی‌کم…</td><td>قید (constraint) + میرایی (<code>MathUtils.damp</code>) + نویز</td></tr>
+              <tr><td>حرکت دوربین<span class="en-term">Camera move</span></td><td>پن، تیلت، دالی، کرین…</td><td><code>gsap.to(cam, {...})</code> · Timeline · ScrollTrigger</td></tr>
+              <tr><td>فوکوس و دیافراگم<span class="en-term">Focus / Aperture</span></td><td>کدام لایه واضح است</td><td><code>BokehPass</code> · <code>filter: blur()</code> · <code>backdrop-filter</code></td></tr>
+              <tr><td>فریم‌ریت و شاتر<span class="en-term">FPS / Shutter</span></td><td>نرمی حرکت، موشن‌بلور، سرعت زمان</td><td><code>requestAnimationFrame</code> · deltaTime · <code>timeScale()</code> · Motion blur</td></tr>
+              <tr><td>ترنزیشن<span class="en-term">Transition</span></td><td>اتصال دو نما</td><td>GSAP + <code>clip-path</code> · Shader · <code>startViewTransition()</code></td></tr>
+              <tr><td>تدوین<span class="en-term">Editing</span></td><td>ترتیب، ریتم و معنای نماها</td><td>EDL (آرایه‌ی داده) ← <code>gsap.timeline()</code> · State machine</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== FOUNDATION ===================== -->
+      <section id="foundation" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">⚙ · FOUNDATION</span>
+          <h2>پایه‌ی کد: یک دوربین مجازی «سینمایی» <small>Camera State Pattern</small></h2>
+          <p class="lead">
+            همه‌ی دموهای این سند روی یک الگوی ساده ساخته شده‌اند: دوربین را با یک <b>آبجکت وضعیت</b> توصیف می‌کنیم
+            (موقعیت، نقطه‌ی هدف، رول، فاصله‌ی کانونی) و هر حرکت سینمایی فقط <b>tween کردن همین اعداد</b> با GSAP است.
+            این جدا کردن «داده» از «اعمال روی دوربین» باعث می‌شود حرکت‌ها قابل ترکیب، قابل اسکراب با اسکرول و قابل ذخیره به‌شکل JSON باشند.
+          </p>
+        </div>
+
+        <div class="code-tabs">
+          <pre data-title="camera-rig.js"><code class="language-javascript">
+            import * as THREE from 'three';
+            import gsap from 'gsap';
+
+            const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.05, 400);
+            camera.filmGauge = 36;      // عرض سنسور فول‌فریم (mm) ⇒ فاصله‌ی کانونی‌ها مثل لنز واقعی
+
+            // وضعیت دوربین: تمام «زبان سینما» در همین چند عدد است
+            const cam = {
+              x: 0, y: 1.6, z: 5,          // موقعیت (متر) — ارتفاع چشم انسان ≈ 1.6
+              tx: 0, ty: 1.5, tz: 0,       // نقطه‌ای که به آن نگاه می‌کنیم
+              roll: 0,                     // درجه (Dutch angle / Roll)
+              focal: 35,                   // فاصله‌ی کانونی (mm)
+              shiftX: 0, shiftY: 0,        // جابه‌جایی کادر (Lens shift / ترکیب‌بندی)
+            };
+
+            function applyCamera() {
+              camera.position.set(cam.x, cam.y, cam.z);
+              camera.lookAt(cam.tx, cam.ty, cam.tz);
+              camera.rotateZ(THREE.MathUtils.degToRad(cam.roll));
+              camera.setFocalLength(cam.focal);           // fov را خودش حساب می‌کند
+              if (cam.shiftX || cam.shiftY) {
+                const W = 1000, H = W / camera.aspect;
+                camera.setViewOffset(W, H, cam.shiftX * W, cam.shiftY * H, W, H);
+              } else camera.clearViewOffset();
+            }
+
+            // حرکت دوربین = tween ؛ کات = set
+            const moveTo = (state, opts) =&gt; gsap.to(cam, { ...state, duration: 1.6, ease: 'power2.inOut', ...opts });
+            const cutTo  = (state) =&gt; gsap.set(cam, state);
+
+            renderer.setAnimationLoop(() =&gt; { applyCamera(); renderer.render(scene, camera); });
+          </code></pre>
+          <pre data-title="lens-math.js"><code class="language-javascript">
+            // ریاضی لنز — همان فرمول‌های عکاسی
+            const DEG = Math.PI / 180;
+
+            // ۱) فاصله‌ی کانونی ⇒ زاویه‌ی دید عمودی (برای سنسور با ارتفاع filmH)
+            const vfov = (focalMM, filmH = 36 / camera.aspect) =&gt; 2 * Math.atan(filmH / (2 * focalMM)) / DEG;
+
+            // ۲) چه فاصله‌ای لازم است تا ارتفاع h (متر) کل کادر عمودی را پر کند؟
+            const distanceForHeight = (h, fovDeg) =&gt; (h / 2) / Math.tan((fovDeg * DEG) / 2);
+
+            // ۳) زاویه‌ی دید افقی از عمودی
+            const hfov = (vfovDeg, aspect) =&gt; 2 * Math.atan(Math.tan((vfovDeg * DEG) / 2) * aspect) / DEG;
+
+            // مثال: لنز 50mm روی 16:9 ⇒ vfov ≈ 22.9° ؛ برای Medium Shot (h≈0.9m) ⇒ d ≈ 2.22m
+          </code></pre>
+          <pre data-title="scroll-driven.js"><code class="language-javascript">
+            import { ScrollTrigger } from 'gsap/ScrollTrigger';
+            gsap.registerPlugin(ScrollTrigger);
+
+            // یک «سکانس» دوربین که با اسکرول کاربر اسکراب می‌شود
+            const tl = gsap.timeline({
+              scrollTrigger: { trigger: '#story', start: 'top top', end: '+=3000', scrub: 1, pin: true },
+            });
+            tl.to(cam, { z: 9, y: 4, ty: 1, duration: 1 })            // Crane up — Establishing
+              .to(cam, { z: 2.2, y: 1.6, ty: 1.4, duration: 1 })      // Push in تا MS
+              .to(cam, { focal: 85, duration: 0.5 }, '&lt;0.5');           // هم‌زمان لنز بلندتر
+          </code></pre>
+        </div>
+
+        <div class="callout tip">
+          <b>💡 چرا «متر» و «میلی‌متر»؟</b>
+          وقتی واحدهای صحنه واقعی باشند (بازیگر ۱.۷۵ متر، لنز ۳۵ میلی‌متر، سنسور ۳۶ میلی‌متر)، هر چیزی که فیلم‌بردارها می‌گویند
+          مستقیم قابل‌ترجمه است: «۸۵ میلی‌متر از ۲ متری» در کد همان معنی و همان تصویر را دارد. <code>camera.filmGauge</code> و
+          <code>camera.setFocalLength()</code> دقیقاً برای همین در Three.js وجود دارند.
+        </div>
+      </section>
+
+      <!-- ===================== 01 SHOT SIZES ===================== -->
+      <section id="shot-sizes" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 01 · SHOT SIZES</span>
+          <h2>اندازه نما <small>Camera Shot Sizes</small></h2>
+          <p class="lead">
+            اندازه نما می‌گوید <b>چه مقدار از سوژه و محیط</b> در کادر دیده می‌شود. اندازه نما مستقیماً «فاصله‌ی عاطفی» مخاطب با شخصیت را تعیین می‌کند:
+            هرچه نزدیک‌تر، صمیمی‌تر و شدیدتر؛ هرچه بازتر، عینی‌تر و محیطی‌تر.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>کنترل اطلاعات (مکان ↔ احساس) و کنترل فاصله‌ی عاطفی مخاطب با سوژه.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>اینترو و هیرو (Wide)، کارت محصول (MS/MCU)، هایلایت جزئیات (CU/ECU/Insert)، سلسله‌مراتب بصری صفحه.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p>اندازه نما = تابعی از <b>فاصله</b> و <b>fov</b>: <code>d = (h/2)/tan(fov/2)</code>. در UI: <code>scale</code>، <code>object-fit</code> و کراپ.</p></div>
+        </div>
+
+        <h3>انواع اندازه نما</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>نما</th><th>چه چیزی در کادر است</th><th>حس / هدف روایی</th><th>کاربرد در وب و تجربه‌های تعاملی</th></tr></thead>
+            <tbody>
+              <tr><td>نمای خیلی باز<span class="en-term">EWS · Extreme Wide</span></td><td>محیط عظیم، سوژه ریز یا نامرئی</td><td>معرفی جهان، مقیاس، تنهایی؛ اغلب Establishing</td><td>اینتروی سین سه‌بعدی، نقشه، صفحه‌ی لودینگ</td></tr>
+              <tr><td>نمای باز<span class="en-term">WS / LS · Wide / Long</span></td><td>کل بدن + فضای زیاد اطراف</td><td>رابطه‌ی سوژه با مکان</td><td>هیرو با کاراکتر کوچک، فضای منفی زیاد</td></tr>
+              <tr><td>نمای کامل<span class="en-term">FS · Full Shot</span></td><td>از سر تا پا، بدن کادر را پر می‌کند</td><td>زبان بدن، لباس، حرکت</td><td>انتخاب کاراکتر، کانفیگوریتور لباس و آواتار</td></tr>
+              <tr><td>مدیوم باز / کابوی<span class="en-term">MWS · Cowboy</span></td><td>از وسط ران به بالا</td><td>اکشن + چهره؛ میراث وسترن</td><td>اسپلش بازی، کارت معرفی تیم</td></tr>
+              <tr><td>نمای مدیوم<span class="en-term">MS · Medium</span></td><td>از کمر به بالا</td><td>خنثی و گفت‌وگومحور</td><td>آواتار دستیار، ویدیوی آموزشی</td></tr>
+              <tr><td>مدیوم کلوزآپ<span class="en-term">MCU</span></td><td>از سینه به بالا</td><td>صمیمی ولی با کمی زبان بدن</td><td>پروفایل، ویدیوکال، Testimonial</td></tr>
+              <tr><td>کلوزآپ<span class="en-term">CU · Close-Up</span></td><td>صورت کادر را پر می‌کند</td><td>احساس، واکنش، همدلی</td><td>لحظه‌ی احساسی در اسکرول‌تلینگ</td></tr>
+              <tr><td>اکستریم کلوزآپ<span class="en-term">ECU</span></td><td>یک جزء: چشم، لب، دست</td><td>شدت، تنش، جزئیات پنهان</td><td>ماکروی محصول، ترنزیشن «ورود به چشم»</td></tr>
+              <tr><td>اینسرت<span class="en-term">Insert</span></td><td>شیء کلیدی (نامه، گوشی، ساعت)</td><td>اطلاعات حیاتی داستان</td><td>هایلایت فیچر، نمایش نوتیفیکیشن در سین</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="shot-sizes"></div>
+
+        <h3>معادل در کد</h3>
+        <p>
+          برای ساختن هر اندازه نما، کافی است «بازه‌ی عمودی» دلخواه روی بدن سوژه را بدانیم (مثلاً MS = از کمر ۱.۰ متر تا بالای سر ۱.۸۵)،
+          سپس با فرمول لنز فاصله‌ی دوربین را حساب کنیم. این روش مستقل از اندازه‌ی صفحه است و روی موبایل و دسکتاپ کادر یکسان می‌سازد.
+        </p>
+        <div class="code-tabs">
+          <pre data-title="Three.js — frameSubject"><code class="language-javascript">
+            // آناتومی بازیگر ۱.۷۵ متری (ارتفاع از زمین)
+            const BODY = { top: 1.75, eyes: 1.65, chin: 1.52, chest: 1.25, waist: 1.0, thigh: 0.62, feet: 0 };
+
+            const SHOT_SIZES = {
+              FS:  [-0.08, 1.92],   // [پایین کادر، بالای کادر] با کمی Headroom و Footroom
+              MWS: [0.55, 1.88],
+              MS:  [0.95, 1.86],
+              MCU: [1.24, 1.84],
+              CU:  [1.44, 1.81],
+              ECU: [1.60, 1.705],
+            };
+
+            function frameSubject(camera, subject, [bottom, top]) {
+              const h = top - bottom;
+              const fov = THREE.MathUtils.degToRad(camera.fov);
+              const d = (h / 2) / Math.tan(fov / 2);          // فاصله‌ی لازم
+              const cy = subject.position.y + (bottom + top) / 2;
+              return { x: subject.position.x, y: cy, z: subject.position.z + d, tx: subject.position.x, ty: cy, tz: subject.position.z };
+            }
+
+            moveTo(frameSubject(camera, actor, SHOT_SIZES.MCU));
+          </code></pre>
+          <pre data-title="Three.js — fit Box3"><code class="language-javascript">
+            // برای مدل‌های دلخواه (GLTF): کادربندی بر اساس Bounding Box
+            function fitToObject(camera, object, padding = 1.15) {
+              const box = new THREE.Box3().setFromObject(object);
+              const size = box.getSize(new THREE.Vector3());
+              const center = box.getCenter(new THREE.Vector3());
+              const vfov = THREE.MathUtils.degToRad(camera.fov);
+              const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+              const distV = (size.y * padding / 2) / Math.tan(vfov / 2);
+              const distH = (size.x * padding / 2) / Math.tan(hfov / 2);
+              const d = Math.max(distV, distH) + size.z / 2;   // هر کدام محدودکننده‌تر است
+              return { x: center.x, y: center.y, z: center.z + d, tx: center.x, ty: center.y, tz: center.z };
+            }
+          </code></pre>
+          <pre data-title="CSS — Shot sizes in UI"><code class="language-css">
+            /* اندازه نما در UI = مقیاس + نقطه‌ی کانونی کراپ */
+            .media { overflow: hidden; aspect-ratio: 16 / 9; }
+            .media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.6,0,.2,1); }
+
+            .media[data-shot="ws"]  img { transform: scale(1);   object-position: 50% 50%; }
+            .media[data-shot="ms"]  img { transform: scale(1.8); transform-origin: 50% 30%; }
+            .media[data-shot="cu"]  img { transform: scale(3.2); transform-origin: 50% 22%; } /* صورت */
+            .media[data-shot="ecu"] img { transform: scale(6);   transform-origin: 48% 20%; } /* چشم‌ها */
+          </code></pre>
+          <pre data-title="GSAP — Shot progression"><code class="language-javascript">
+            // الگوی کلاسیک: از باز به بسته (Establish → Detail) هم‌گام با اسکرول
+            const tl = gsap.timeline({ scrollTrigger: { trigger: '#chapter', scrub: true, pin: true, end: '+=2500' } });
+            ['EWS', 'WS', 'MS', 'CU'].forEach((s) =&gt; tl.to(cam, { ...frameSubject(camera, actor, RANGES[s]), duration: 1 }));
+          </code></pre>
+        </div>
+
+        <div class="callout tip">
+          <b>💡 نکته‌های کریتیو دولوپر</b>
+          <ul>
+            <li><b>Establish → Detail:</b> الگوی قدیمی سینما برای شروع صفحه هم جواب می‌دهد: اول بافت و جهان، بعد محصول، بعد جزئیات.</li>
+            <li>در موبایل (کادر عمودی) <b>hfov</b> محدودکننده است، نه vfov؛ برای همین در <code>fitToObject</code> هر دو را حساب کنید.</li>
+            <li>کلوزآپ بدون Wide معنا ندارد؛ مخاطب باید اول جغرافیا را بداند تا جزئیات را بفهمد.</li>
+          </ul>
+        </div>
+        <div class="callout warn">
+          <b>⚠️ اشتباه رایج</b>
+          نزدیک کردن دوربین با کم کردن <code>fov</code> (زوم) به‌جای جابه‌جا کردن دوربین. نتیجه کادر یکسان است ولی <b>پرسپکتیو</b> متفاوت می‌شود (فصل لنزها را ببینید).
+        </div>
+      </section>
+
+      <!-- ===================== 02 FRAMING ===================== -->
+      <section id="framing" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 02 · SHOT FRAMING &amp; COMPOSITION</span>
+          <h2>کادربندی و ترکیب‌بندی <small>Shot Framing</small></h2>
+          <p class="lead">
+            اندازه نما می‌گوید «چقدر»؛ کادربندی می‌گوید «چه کسی، کجای قاب، در کنار چه کسی».
+            تعداد سوژه‌ها (Single / Two / Three)، نقطه‌ی دید (OTS / POV) و قوانین ترکیب‌بندی (یک‌سوم، فضای نگاه، قرینه) همه ابزار هدایت نگاه‌اند.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>نشان دادن رابطه‌ی بین شخصیت‌ها، قدرت، تنهایی یا اتحاد؛ و هدایت چشم مخاطب به نقطه‌ی مهم.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>چیدمان هیرو (متن در فضای نگاه)، کراپ آواتار، سین‌های دیالوگ، دوربین اول‌شخص، پورتال و ماسک.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>setViewOffset</code> (جابه‌جایی کادر بدون حرکت دوربین)، CSS Grid برای یک‌سوم، <code>clip-path</code> و Render Target برای کادر در کادر.</p></div>
+        </div>
+
+        <h3>انواع کادربندی</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>نوع</th><th>توضیح</th><th>حس / هدف</th><th>معادل کد / کاربرد</th></tr></thead>
+            <tbody>
+              <tr><td>سینگل<span class="en-term">Single</span></td><td>یک نفر در قاب</td><td>تمرکز روی یک شخصیت</td><td>فوکوس روی یک آیتم/کارت</td></tr>
+              <tr><td>دو نفره<span class="en-term">Two Shot</span></td><td>دو نفر در قاب</td><td>رابطه، تعادل یا تقابل</td><td>مقایسه‌ی دو پلن/محصول</td></tr>
+              <tr><td>سه نفره<span class="en-term">Three Shot</span></td><td>سه نفر، معمولاً مثلثی</td><td>سلسله‌مراتب و عمق</td><td>ترکیب مثلثی در هیرو</td></tr>
+              <tr><td>از روی شانه<span class="en-term">OTS</span></td><td>پشت شانه‌ی یکی، رو به دیگری</td><td>حضور در گفت‌وگو، جغرافیا</td><td>دوربین دیالوگ در بازی</td></tr>
+              <tr><td>نقطه‌ی دید<span class="en-term">POV</span></td><td>از چشم شخصیت</td><td>هم‌ذات‌پنداری کامل</td><td><code>PointerLockControls</code>، WebXR</td></tr>
+              <tr><td>قانون یک‌سوم<span class="en-term">Rule of Thirds</span></td><td>نقاط مهم روی خطوط ۱/۳</td><td>تعادل پویا، طبیعی</td><td><code>grid-template-columns: repeat(3, 1fr)</code></td></tr>
+              <tr><td>فضای نگاه<span class="en-term">Lead / Look Room</span></td><td>فضای خالی در جهت نگاه یا حرکت</td><td>راحتی، جهت‌دار بودن</td><td>متن را در جهت نگاه تصویر بگذارید</td></tr>
+              <tr><td>کادر بسته پشت<span class="en-term">Short-siding</span></td><td>فضای خالی پشت سر</td><td>تنش، خفگی (اگر عمدی)</td><td>برای ایجاد ناآرامی</td></tr>
+              <tr><td>هدروم<span class="en-term">Headroom</span></td><td>فضای بالای سر</td><td>کم: فشار؛ زیاد: کوچکی</td><td><code>object-position: 50% 30%</code></td></tr>
+              <tr><td>قرینه<span class="en-term">Symmetry</span></td><td>توازن حول محور مرکزی</td><td>نظم، کنترل، عجیب بودن</td><td>لندینگ مینیمال، لوگو ریویل</td></tr>
+              <tr><td>کادر در کادر<span class="en-term">Frame within Frame</span></td><td>در/پنجره/آینه به‌عنوان قاب</td><td>محصور بودن، دیدزدن</td><td><code>clip-path</code>، پورتال با <code>WebGLRenderTarget</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="framing"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Three.js — setViewOffset"><code class="language-javascript">
+            // سوژه را روی یک‌سوم چپ ببر، بدون اینکه پرسپکتیو تغییر کند (مثل Lens Shift)
+            // shiftX مثبت ⇒ پنجره به راست می‌رود ⇒ سوژه به چپ می‌آید
+            function compose(camera, shiftX = 0, shiftY = 0) {
+              const W = 1000, H = W / camera.aspect;
+              camera.setViewOffset(W, H, shiftX * W, shiftY * H, W, H);
+            }
+            compose(camera, 1 / 6, 0.1);   // سوژه از مرکز (½) به یک‌سوم (⅓) — چشم‌ها به یک‌سوم بالا
+
+            // چرا نه lookAt به نقطه‌ی دیگر؟ چون آن کار دوربین را می‌چرخاند و خطوط عمودی کج می‌شوند؛
+            // ViewOffset مثل لنزهای Tilt-Shift فقط کادر را جابه‌جا می‌کند.
+          </code></pre>
+          <pre data-title="Three.js — OTS / POV"><code class="language-javascript">
+            const headOf = (actor) =&gt; actor.localToWorld(new THREE.Vector3(0, 1.62, 0));
+
+            // Over-the-shoulder: پشت و کمی کنار شانه‌ی A، رو به صورت B
+            function overShoulder(A, B, side = 1) {
+              const a = headOf(A), b = headOf(B);
+              const dir = b.clone().sub(a).normalize();
+              const right = new THREE.Vector3().crossVectors(dir, THREE.Object3D.DEFAULT_UP);
+              const pos = a.clone().addScaledVector(dir, -0.9).addScaledVector(right, 0.35 * side).add(new THREE.Vector3(0, 0.05, 0));
+              return { x: pos.x, y: pos.y, z: pos.z, tx: b.x, ty: b.y - 0.05, tz: b.z, focal: 50 };
+            }
+
+            // POV: دوربین دقیقاً در جای چشم‌ها؛ سر خود بازیگر را مخفی کن تا جلوی لنز را نگیرد
+            function pov(A, B) {
+              A.userData.head.visible = false;
+              const a = headOf(A), b = headOf(B);
+              return { x: a.x, y: a.y + 0.02, z: a.z, tx: b.x, ty: b.y, tz: b.z, focal: 24 };
+            }
+          </code></pre>
+          <pre data-title="CSS — Rule of thirds"><code class="language-css">
+            /* هیرو با قانون یک‌سوم و Lead Room */
+            .hero {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              grid-template-rows: repeat(3, 1fr);
+              min-height: 100svh;
+            }
+            .hero .subject  { grid-column: 1;     grid-row: 1 / 4; }  /* سوژه روی یک‌سوم اول، رو به راست */
+            .hero .headline { grid-column: 2 / 4; grid-row: 2; }      /* متن در «فضای نگاه» */
+
+            /* هدروم درست در کراپ آواتار: چشم‌ها روی یک‌سوم بالایی */
+            .avatar img { object-fit: cover; object-position: 50% 28%; }
+
+            /* کادر در کادر */
+            .window-frame { clip-path: inset(12% 18% round 240px 240px 0 0); }
+          </code></pre>
+          <pre data-title="Three.js — Frame in frame (Portal)"><code class="language-javascript">
+            // دنیای دوم را روی یک تکسچر رندر کن و داخل «قاب» (در/پنجره) نشان بده
+            const rt = new THREE.WebGLRenderTarget(1024, 1024);
+            const portal = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 2.5), new THREE.MeshBasicMaterial({ map: rt.texture }));
+            renderer.setAnimationLoop(() =&gt; {
+              renderer.setRenderTarget(rt);  renderer.render(otherScene, otherCamera);
+              renderer.setRenderTarget(null); renderer.render(scene, camera);
+            });
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 نکته</b> چشم انسان در تصویر اول دنبال <b>چهره</b> و بعد دنبال <b>جهت نگاه</b> آن چهره می‌رود. اگر کاراکتر یا مدل شما به سمت دکمه‌ی CTA نگاه کند، CTA بیشتر دیده می‌شود — این همان Lead Room است که به UI ترجمه شده.
+        </div>
+      </section>
+
+      <!-- ===================== 03 ANGLES ===================== -->
+      <section id="angles" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 03 · CAMERA ANGLES</span>
+          <h2>زاویه دوربین <small>Camera Angles</small></h2>
+          <p class="lead">
+            زاویه یعنی دوربین <b>از چه ارتفاعی و با چه شیبی</b> به سوژه نگاه می‌کند. زاویه مستقیماً روی «قدرت» شخصیت در ذهن مخاطب اثر می‌گذارد:
+            از پایین = قدرتمند، از بالا = آسیب‌پذیر، کج = ناآرام. در StudioBinder دو دسته داریم: <b>زاویه</b> (Low/High/Overhead/Dutch…) و <b>ارتفاع</b> (Eye/Shoulder/Hip/Knee/Ground).
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>ساختن رابطه‌ی قدرت بین مخاطب و سوژه، و انتقال حالت روانی (ثبات، ترس، جنون).</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>معرفی قهرمانانه‌ی محصول (Low)، Flat-lay و نقشه (Overhead)، حالت‌های گلیچ و خطا (Dutch).</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p>ارتفاع <code>camera.position.y</code> نسبت به چشم سوژه، مختصات کروی <code>Spherical</code>، و <code>camera.rotateZ()</code> برای Dutch.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>زاویه</th><th>موقعیت دوربین</th><th>حس / پیام</th><th>کاربرد</th></tr></thead>
+            <tbody>
+              <tr><td>هم‌سطح چشم<span class="en-term">Eye Level</span></td><td>y ≈ ارتفاع چشم</td><td>خنثی، برابر</td><td>پیش‌فرض اکثر سین‌ها</td></tr>
+              <tr><td>زاویه‌ی پایین<span class="en-term">Low Angle</span></td><td>پایین‌تر از چشم، رو به بالا</td><td>قدرت، تسلط، تهدید</td><td>محصول پرچم‌دار، باس بازی</td></tr>
+              <tr><td>زاویه‌ی بالا<span class="en-term">High Angle</span></td><td>بالاتر، رو به پایین</td><td>ضعف، آسیب‌پذیری</td><td>Game Over، نمای میز کار</td></tr>
+              <tr><td>عمود از بالا<span class="en-term">Overhead</span></td><td>دقیقاً بالای سوژه</td><td>گرافیکی، نقشه‌ای، دانای کل</td><td>Flat-lay، بازی top-down</td></tr>
+              <tr><td>نمای پرنده<span class="en-term">Bird's Eye</span></td><td>خیلی بالا و دور</td><td>مقیاس، جغرافیا</td><td>نقشه‌ی تعاملی، معرفی شهر</td></tr>
+              <tr><td>هم‌سطح شانه<span class="en-term">Shoulder Level</span></td><td>کمی زیر چشم</td><td>قوی ولی طبیعی</td><td>جایگزین ظریف Low Angle</td></tr>
+              <tr><td>هم‌سطح لگن<span class="en-term">Hip Level</span></td><td>ارتفاع کمر</td><td>تأکید روی دست‌ها و ابزار</td><td>وسترن، اکشن دست</td></tr>
+              <tr><td>هم‌سطح زانو<span class="en-term">Knee Level</span></td><td>ارتفاع زانو</td><td>برتری بدون اغراق</td><td>ورود کاراکتر</td></tr>
+              <tr><td>هم‌سطح زمین<span class="en-term">Ground Level</span></td><td>روی زمین</td><td>بزرگ‌نمایی آنچه روی زمین است</td><td>کفش، قدم‌ها</td></tr>
+              <tr><td>چشم کرم<span class="en-term">Worm's Eye</span></td><td>از زمین تقریباً عمود به بالا</td><td>عظمت اغراق‌شده</td><td>معماری، برج‌ها</td></tr>
+              <tr><td>زاویه‌ی هلندی<span class="en-term">Dutch / Canted</span></td><td>چرخش حول محور لنز</td><td>ناآرامی، جنون، خطا</td><td>گلیچ، ارور، مستی</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="angles"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Three.js — Angle presets"><code class="language-javascript">
+            // زاویه = اختلاف ارتفاع دوربین با چشم سوژه + شیب نگاه
+            const EYE = 1.65;
+            const ANGLES = {
+              eye:      { y: EYE,  ty: 1.5 },
+              low:      { y: 0.55, ty: 1.45 },     // از پایین به بالا
+              high:     { y: 3.4,  ty: 1.1 },      // از بالا به پایین
+              overhead: { y: 5.5,  z: 0.05, ty: 0 },
+              dutch:    { y: 1.6,  roll: 18 },
+            };
+            moveTo(ANGLES.low);
+          </code></pre>
+          <pre data-title="Three.js — Spherical"><code class="language-javascript">
+            // کنترل زاویه با مختصات کروی: فاصله، زاویه‌ی عمودی (phi)، زاویه‌ی افقی (theta)
+            const sph = new THREE.Spherical(3.2, THREE.MathUtils.degToRad(90), 0); // phi=90° ⇒ هم‌سطح
+            const target = new THREE.Vector3(0, 1.5, 0);
+
+            function setAngle({ elevation = 0, azimuth = 0, distance = 3.2 }) {
+              sph.set(distance, THREE.MathUtils.degToRad(90 - elevation), THREE.MathUtils.degToRad(azimuth));
+              camera.position.setFromSpherical(sph).add(target);
+              camera.lookAt(target);
+            }
+            setAngle({ elevation: -25 }); // Low angle
+            setAngle({ elevation: 60 });  // High angle
+            setAngle({ elevation: 89.9 });// Overhead (نه دقیقاً ۹۰ تا lookAt مبهم نشود)
+          </code></pre>
+          <pre data-title="Dutch angle"><code class="language-javascript">
+            // ترتیب مهم است: اول lookAt بعد rotateZ (حول محور دید خود دوربین)
+            camera.lookAt(target);
+            camera.rotateZ(THREE.MathUtils.degToRad(18));
+
+            // یا انیمیت شده و «لرزان» برای حالت سرگیجه
+            gsap.to(cam, { roll: 12, duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+
+            // در CSS برای UI:
+            // .glitch-state { transform: rotate(-4deg) scale(1.08); }   /* scale برای پوشاندن گوشه‌های خالی */
+          </code></pre>
+        </div>
+        <div class="callout warn">
+          <b>⚠️ تله‌ی Overhead</b>
+          وقتی دوربین دقیقاً عمود به پایین نگاه می‌کند، بردار <code>up</code> (0,1,0) با جهت دید موازی می‌شود و <code>lookAt</code> نتیجه‌ی غیرقابل پیش‌بینی می‌دهد (چرخش ناگهانی).
+          راه‌حل: یا <code>camera.up.set(0, 0, -1)</code> قبل از lookAt، یا یک انحراف خیلی کوچک در z.
+        </div>
+      </section>
+      <!-- ===================== 04 DOF ===================== -->
+      <section id="dof" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 04 · DEPTH OF FIELD</span>
+          <h2>عمق میدان و فوکوس <small>Depth of Field</small></h2>
+          <p class="lead">
+            عمق میدان (DOF) محدوده‌ای از فاصله‌هاست که در تصویر <b>واضح</b> دیده می‌شود. سه عامل آن را کنترل می‌کنند:
+            <b>دیافراگم</b> (f-stop کوچک‌تر ⇐ عمق کمتر)، <b>فاصله‌ی کانونی</b> (لنز بلندتر ⇐ عمق کمتر) و <b>فاصله‌ی فوکوس</b> (سوژه‌ی نزدیک‌تر ⇐ عمق کمتر).
+            DOF قدرتمندترین ابزار برای گفتن «<b>اینجا را نگاه کن</b>» است.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>جداسازی سوژه از پس‌زمینه، هدایت توجه، ساختن لایه‌های عمق و حس «سینمایی».</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>مودال روی پس‌زمینه‌ی محو، Rack focus بین متن و تصویر در اسکرول، بوکه‌ی نورهای شهر، فوکوس روی آیتم انتخابی.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>BokehPass</code> در Three.js (یا <code>DepthOfFieldEffect</code> در pmndrs/postprocessing)، <code>filter: blur()</code> و <code>backdrop-filter</code> در CSS.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>مفهوم</th><th>توضیح</th><th>حس / کاربرد</th><th>در کد</th></tr></thead>
+            <tbody>
+              <tr><td>عمق میدان کم<span class="en-term">Shallow DOF</span></td><td>فقط سوژه واضح، بقیه محو</td><td>صمیمیت، انزوا، تمرکز</td><td><code>aperture</code> بالا</td></tr>
+              <tr><td>فوکوس عمیق<span class="en-term">Deep Focus</span></td><td>همه‌چیز از جلو تا افق واضح</td><td>میزانسن پرجزئیات، عینیت</td><td>DOF خاموش یا <code>aperture≈0</code></td></tr>
+              <tr><td>جابه‌جایی فوکوس<span class="en-term">Rack Focus</span></td><td>انتقال فوکوس در طول نما</td><td>جابه‌جایی توجه بدون کات</td><td>tween روی <code>focus</code></td></tr>
+              <tr><td>دیافراگم<span class="en-term">Aperture / f-stop</span></td><td>f/1.4 باز … f/22 بسته</td><td>باز: نور زیاد + DOF کم</td><td>نگاشت به شدت بلور</td></tr>
+              <tr><td>بوکه<span class="en-term">Bokeh</span></td><td>شکل نورهای محو</td><td>زیبایی، رؤیا، شب شهری</td><td>کرنل بلور دایره‌ای/شش‌ضلعی</td></tr>
+              <tr><td>فاصله‌ی هایپرفوکال<span class="en-term">Hyperfocal</span></td><td>فوکوسی که تا بی‌نهایت واضح است</td><td>منظره، معماری</td><td><code>H = f²/(N·c) + f</code></td></tr>
+              <tr><td>دیوپتر دوتکه<span class="en-term">Split Diopter</span></td><td>دو فاصله‌ی متفاوت هم‌زمان واضح</td><td>تنش بین دو سوژه (دی پالما)</td><td>دو پاس رندر + ماسک</td></tr>
+              <tr><td>فوکوس نرم<span class="en-term">Soft Focus</span></td><td>هاله‌ی ملایم روی کل تصویر</td><td>رؤیا، فلش‌بک، نوستالژی</td><td>Bloom ملایم + بلور کم</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="dof"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Three.js — BokehPass"><code class="language-javascript">
+            import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+            import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+            import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+            import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+            const composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            const bokeh = new BokehPass(scene, camera, {
+              focus: 3.0,       // فاصله‌ی فوکوس (واحد صحنه = متر) در امتداد دید دوربین
+              aperture: 0.01,   // شدت (بزرگ‌تر = دیافراگم بازتر)
+              maxblur: 0.016,   // سقف بلور (درصد از کادر)
+            });
+            composer.addPass(bokeh);
+            composer.addPass(new OutputPass()); // تون‌مپینگ و sRGB در پایان
+
+            renderer.setAnimationLoop(() =&gt; composer.render());
+
+            // Rack focus
+            gsap.to(bokeh.uniforms.focus, { value: 7.3, duration: 1.4, ease: 'power2.inOut' });
+          </code></pre>
+          <pre data-title="فیزیک DOF"><code class="language-javascript">
+            // محاسبه‌ی واقعی (برای اینکه پارامترهای «عکاسی» به UI بدهید)
+            const COC = 0.03; // دایره‌ی ابهام مجاز فول‌فریم (mm)
+            function depthOfField(focalMM, N, focusM) {
+              const f = focalMM / 1000, c = COC / 1000, s = focusM;
+              const H = (f * f) / (N * c) + f;                         // هایپرفوکال
+              const near = (s * (H - f)) / (H + s - 2 * f);
+              const far  = s &gt;= H ? Infinity : (s * (H - f)) / (H - s);
+              return { H, near, far, total: far - near };
+            }
+            depthOfField(85, 1.4, 3);  // ⇒ ~ 2.96m تا 3.04m  (فقط ۸ سانت!)
+            depthOfField(24, 11, 3);   // ⇒ ~ 1.1m تا ∞
+
+            // نگاشت تقریبی به BokehPass: CoC ∝ f² / (N · s)
+            bokeh.uniforms.aperture.value = (f * f) / (N * s * (s - f) * filmHeight) * k;
+          </code></pre>
+          <pre data-title="Focus on pointer"><code class="language-javascript">
+            // فوکوس خودکار روی چیزی که کاربر به آن اشاره می‌کند (Autofocus)
+            const ray = new THREE.Raycaster();
+            addEventListener('pointermove', (e) =&gt; {
+              const p = new THREE.Vector2((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+              ray.setFromCamera(p, camera);
+              const hit = ray.intersectObjects(scene.children, true)[0];
+              if (!hit) return;
+              // BokehPass فاصله را در امتداد محور دید می‌خواهد (نه فاصله‌ی اقلیدسی)
+              const viewZ = hit.point.clone().applyMatrix4(camera.matrixWorldInverse).z;
+              gsap.to(bokeh.uniforms.focus, { value: -viewZ, duration: 0.6, ease: 'power3.out', overwrite: true });
+            });
+          </code></pre>
+          <pre data-title="CSS — DOF in UI"><code class="language-css">
+            /* لایه‌ها به‌عنوان «فاصله»: هرچه دورتر از لایه‌ی فوکوس، محوتر */
+            .layer { filter: blur(calc(var(--depth-delta) * 6px)); transition: filter .6s; }
+
+            /* Shallow DOF برای مودال: پس‌زمینه محو و تیره */
+            .modal-backdrop { backdrop-filter: blur(14px) brightness(.6) saturate(1.2); }
+
+            /* Rack focus بین دو ستون */
+            .split[data-focus="left"]  .right,
+            .split[data-focus="right"] .left { filter: blur(8px); opacity: .55; }
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 نکته‌ها</b>
+          <ul>
+            <li>DOF گران است (یک پاس عمق + نمونه‌برداری زیاد). روی موبایل <code>maxblur</code> و رزولوشن composer را کم کنید یا فقط در لحظه‌های خاص روشن کنید.</li>
+            <li>برای کیفیت بهتر از کتابخانه‌ی <b>pmndrs/postprocessing</b> (<code>DepthOfFieldEffect</code> با بوکه‌ی واقعی) یا در R3F از <code>&lt;DepthOfField&gt;</code> استفاده کنید.</li>
+            <li>Rack focus تقریباً همیشه بهتر از کات است وقتی دو سوژه در یک قاب‌اند — «توجه» را منتقل کنید نه «تصویر» را.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ===================== 05 RIGS ===================== -->
+      <section id="rigs" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 05 · CAMERA GEAR &amp; RIGS</span>
+          <h2>ریگ‌ها و تجهیزات دوربین <small>Camera Rigs</small></h2>
+          <p class="lead">
+            ریگ یعنی دوربین <b>روی چه چیزی سوار است</b>. همان حرکت «دنبال کردن بازیگر» روی دست، روی استدی‌کم یا روی ریل دالی سه حس کاملاً متفاوت دارد.
+            در کد، ریگ = <b>قیدها</b> (کجا می‌تواند برود) + <b>میرایی</b> (چقدر نرم دنبال می‌کند) + <b>نویز</b> (چقدر می‌لرزد).
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>انتخاب «شخصیت» حرکت دوربین: پایدار و رسمی، ارگانیک و مضطرب، یا شناور و رؤیایی.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>Follow camera در بازی، دوربین روی ریل برای اسکرول، پارالاکس ماوس (اسلایدر)، لرزش برای اکشن.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>MathUtils.damp</code>، فنر (spring)، <code>CatmullRomCurve3</code>، نویز Simplex/fbm، والد/فرزند در scene graph.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ریگ</th><th>رفتار</th><th>حس</th><th>الگوی کد</th></tr></thead>
+            <tbody>
+              <tr><td>سه‌پایه<span class="en-term">Tripod</span></td><td>ثابت، فقط پن/تیلت</td><td>پایدار، ناظر، رسمی</td><td>position ثابت + damp روی target</td></tr>
+              <tr><td>روی دست<span class="en-term">Handheld</span></td><td>لرزش ارگانیک</td><td>مستند، فوریت، اضطراب</td><td>نویز fbm روی position/rotation</td></tr>
+              <tr><td>استدی‌کم<span class="en-term">Steadicam</span></td><td>همراهی شناور</td><td>رؤیایی، روان</td><td>damp با lambda کم (۱–۲)</td></tr>
+              <tr><td>گیمبال<span class="en-term">Gimbal</span></td><td>دقیق، افق قفل</td><td>مدرن، چابک</td><td>damp سریع + roll=0</td></tr>
+              <tr><td>دالی / تراک<span class="en-term">Dolly</span></td><td>روی ریل</td><td>کنترل‌شده و نرم</td><td><code>curve.getPointAt(u)</code></td></tr>
+              <tr><td>اسلایدر<span class="en-term">Slider</span></td><td>حرکت کوتاه و آرام</td><td>زنده کردن نمای ثابت</td><td>sin(t) یا موقعیت ماوس</td></tr>
+              <tr><td>کرین / جیب<span class="en-term">Crane / Jib</span></td><td>کمان عمودی بزرگ</td><td>باشکوه، شروع/پایان</td><td>مختصات قطبی حول پیوت</td></tr>
+              <tr><td>پهپاد<span class="en-term">Drone</span></td><td>هوایی، اوربیت</td><td>عظمت، آزادی</td><td>Spherical / اوربیت</td></tr>
+              <tr><td>اسنوری‌کم<span class="en-term">Snorricam</span></td><td>بسته به بدن بازیگر</td><td>گیجی، مستی، پارانویا</td><td><code>actor.add(camera)</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="rigs"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Damping (Steadicam/Gimbal)"><code class="language-javascript">
+            // damp مستقل از فریم‌ریت است (برخلاف lerp ثابت مثل x += (t - x) * 0.1)
+            // lambda کم ⇒ فنر نرم (Steadicam) ؛ lambda زیاد ⇒ سفت (Gimbal)
+            const { damp } = THREE.MathUtils;
+            function followRig(dt, actor, { lambda = 1.6, offset = new THREE.Vector3(0, 1.7, -2.6) } = {}) {
+              const desired = actor.localToWorld(offset.clone());
+              cam.x = damp(cam.x, desired.x, lambda, dt);
+              cam.y = damp(cam.y, desired.y, lambda, dt);
+              cam.z = damp(cam.z, desired.z, lambda, dt);
+              const look = actor.localToWorld(new THREE.Vector3(0, 1.4, 1.5));   // کمی جلوتر از بازیگر
+              cam.tx = damp(cam.tx, look.x, lambda * 1.3, dt);
+              cam.ty = damp(cam.ty, look.y, lambda * 1.3, dt);
+              cam.tz = damp(cam.tz, look.z, lambda * 1.3, dt);
+            }
+          </code></pre>
+          <pre data-title="Handheld shake"><code class="language-javascript">
+            import { createNoise2D } from 'simplex-noise'; // یا یک value-noise ساده
+            const noise = createNoise2D();
+            const fbm = (x, seed) =&gt; noise(x, seed) * 0.6 + noise(x * 2.1, seed + 9) * 0.3 + noise(x * 4.3, seed + 17) * 0.1;
+
+            function handheld(t, intensity = 1) {
+              // بعد از lookAt اعمال شود — در فضای محلی دوربین
+              camera.translateX(fbm(t * 1.3, 0) * 0.045 * intensity);
+              camera.translateY(fbm(t * 1.1, 1) * 0.035 * intensity + Math.sin(t * 9) * 0.006); // تنفس/قدم
+              camera.rotateX(fbm(t * 0.9, 2) * 0.02 * intensity);
+              camera.rotateY(fbm(t * 0.7, 3) * 0.02 * intensity);
+              camera.rotateZ(fbm(t * 0.8, 4) * 0.025 * intensity);
+            }
+            // Trauma-based shake (برای ضربه/انفجار): intensity = trauma², و trauma در هر فریم کم شود
+          </code></pre>
+          <pre data-title="Dolly on rails"><code class="language-javascript">
+            // ریل دالی = یک منحنی؛ دوربین فقط پارامتر u ∈ [0,1] را دارد
+            const track = new THREE.CatmullRomCurve3([
+              new THREE.Vector3(-6, 1.4, 3.6), new THREE.Vector3(-2, 1.4, 4.2),
+              new THREE.Vector3(2, 1.6, 3.4),  new THREE.Vector3(6, 1.4, 3.8),
+            ]);
+            const rig = { u: 0 };
+
+            // اتصال ریل به اسکرول — «Camera on rails»
+            gsap.to(rig, { u: 1, ease: 'none', scrollTrigger: { trigger: '#gallery', scrub: 1, pin: true, end: '+=4000' } });
+
+            renderer.setAnimationLoop(() =&gt; {
+              const p = track.getPointAt(rig.u);
+              camera.position.copy(p);
+              camera.lookAt(track.getPointAt(Math.min(rig.u + 0.02, 1)).add(new THREE.Vector3(0, -0.2, -4)));
+            });
+          </code></pre>
+          <pre data-title="Crane / Drone / Snorricam"><code class="language-javascript">
+            // Crane: انتهای بازوی L حول pivot
+            const a = 0.45 + Math.sin(t * 0.3) * 0.65;
+            camera.position.set(pivot.x, pivot.y + Math.sin(a) * L, pivot.z - (1 - Math.cos(a)) * L);
+
+            // Drone orbit
+            const ang = t * 0.12;
+            camera.position.set(target.x + Math.cos(ang) * 12, 9, target.z + Math.sin(ang) * 12);
+            camera.lookAt(target);
+
+            // Snorricam: دوربین فرزند بازیگر ⇒ همه‌ی حرکت‌ها و چرخش‌های او را به ارث می‌برد
+            actor.add(camera);
+            camera.position.set(0, 1.66, 0.75);
+            camera.lookAt(actor.localToWorld(new THREE.Vector3(0, 1.6, 0)));
+          </code></pre>
+          <pre data-title="Slider (mouse parallax)"><code class="language-javascript">
+            // اسلایدر کوچک که به ماوس واکنش نشان می‌دهد — رایج‌ترین «ریگ» در هیروی سایت‌ها
+            const mouse = { x: 0, y: 0 };
+            addEventListener('pointermove', (e) =&gt; {
+              mouse.x = (e.clientX / innerWidth) * 2 - 1;
+              mouse.y = (e.clientY / innerHeight) * 2 - 1;
+            });
+            renderer.setAnimationLoop(() =&gt; {
+              const dt = clock.getDelta();
+              cam.x = THREE.MathUtils.damp(cam.x, mouse.x * 0.6, 2.5, dt);   // ±60cm
+              cam.y = THREE.MathUtils.damp(cam.y, 1.5 - mouse.y * 0.2, 2.5, dt);
+              applyCamera(); renderer.render(scene, camera);
+            });
+          </code></pre>
+        </div>
+        <div class="callout warn">
+          <b>⚠️ اشتباه رایج</b> لرزش با <code>Math.random()</code>. تصادفی خالص در هر فریم «پرش» می‌سازد، نه لرزش دست. از نویز پیوسته (Simplex/Perlin/fbm) استفاده کنید و لرزش را <b>بعد از</b> lookAt و در فضای محلی دوربین اعمال کنید.
+          همچنین برای کاربرانی که <code>prefers-reduced-motion</code> دارند، لرزش را خاموش کنید.
+        </div>
+      </section>
+
+      <!-- ===================== 06 MOVEMENT ===================== -->
+      <section id="movement" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 06 · CAMERA MOVEMENT</span>
+          <h2>حرکت دوربین <small>Camera Movement</small></h2>
+          <p class="lead">
+            حرکت دوربین باید <b>انگیزه</b> داشته باشد: دنبال کردن سوژه، آشکار کردن اطلاعات، یا تغییر حس. تفاوت‌های ظریف مهم‌اند:
+            <b>Pan</b> می‌چرخد ولی <b>Truck</b> جابه‌جا می‌شود؛ <b>Tilt</b> می‌چرخد ولی <b>Pedestal</b> بالا می‌رود؛ <b>Zoom</b> لنز را عوض می‌کند ولی <b>Dolly</b> دوربین را.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>ریویل، دنبال کردن، افزایش تنش (Push)، رها کردن (Pull)، و ساختن ریتم بصری.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>اسکرول‌تلینگ، ترنزیشن بین سکشن‌های سه‌بعدی، Product reveal، اینترو و اوترو.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>gsap.to(cam)</code>، <code>gsap.timeline()</code>، <code>ScrollTrigger</code> با <code>scrub</code>، easeها به‌عنوان «حس اپراتور».</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>حرکت</th><th>چه چیزی تغییر می‌کند</th><th>حس / هدف</th><th>پارامترهای tween</th></tr></thead>
+            <tbody>
+              <tr><td>ثابت<span class="en-term">Static</span></td><td>هیچ</td><td>تمرکز بر اجرا، تنش ساکن</td><td>—</td></tr>
+              <tr><td>پن<span class="en-term">Pan</span></td><td>چرخش افقی در جا</td><td>آشکار کردن فضا، دنبال کردن</td><td><code>tx</code></td></tr>
+              <tr><td>تیلت<span class="en-term">Tilt</span></td><td>چرخش عمودی در جا</td><td>ریویل قد/ارتفاع</td><td><code>ty</code></td></tr>
+              <tr><td>پوش این / پول اوت<span class="en-term">Push In / Pull Out</span></td><td>دوربین جلو/عقب</td><td>تنش و درک درونی / تنهایی و ریویل</td><td><code>z</code></td></tr>
+              <tr><td>تراک<span class="en-term">Truck</span></td><td>جابه‌جایی جانبی</td><td>پارالاکس، همراهی موازی</td><td><code>x + tx</code></td></tr>
+              <tr><td>تراکینگ<span class="en-term">Tracking</span></td><td>هم‌پای سوژه</td><td>همراه شدن با شخصیت</td><td>سوژه و دوربین با یک ease</td></tr>
+              <tr><td>پدستال<span class="en-term">Pedestal</span></td><td>بالا/پایین بدون چرخش</td><td>حرکت آسانسوری</td><td><code>y + ty</code></td></tr>
+              <tr><td>کرین / بوم<span class="en-term">Crane / Boom</span></td><td>کمان بزرگ عمودی</td><td>شروع یا پایان باشکوه</td><td><code>y, z</code> با target ثابت</td></tr>
+              <tr><td>آرک<span class="en-term">Arc</span></td><td>چرخش دور سوژه</td><td>قهرمانانه، عاشقانه</td><td>زاویه‌ی قطبی</td></tr>
+              <tr><td>زوم<span class="en-term">Zoom</span></td><td>فاصله‌ی کانونی</td><td>مستندگونه، «مصنوعی»</td><td><code>focal</code></td></tr>
+              <tr><td>دالی زوم<span class="en-term">Dolly Zoom</span></td><td>dolly + zoom مخالف</td><td>سرگیجه، شوک، کشف</td><td><code>focal</code> + <code>z</code> محاسبه‌شده</td></tr>
+              <tr><td>ویپ پن<span class="en-term">Whip Pan</span></td><td>پن خیلی سریع</td><td>انرژی، ترنزیشن</td><td><code>tx</code> + blur</td></tr>
+              <tr><td>رول<span class="en-term">Roll</span></td><td>چرخش حول لنز</td><td>بی‌وزنی، گیجی</td><td><code>roll</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="movement"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="GSAP — Moves library"><code class="language-javascript">
+            // کتابخانه‌ی حرکت‌ها: هر حرکت یک تابع که timeline برمی‌گرداند
+            const Moves = {
+              pan:      (to = 3, d = 2)   =&gt; gsap.to(cam, { tx: `+=${to}`, duration: d, ease: 'power2.inOut' }),
+              tilt:     (to = 1.5, d = 2) =&gt; gsap.to(cam, { ty: `+=${to}`, duration: d, ease: 'power2.inOut' }),
+              pushIn:   (z = 1.3, d = 3)  =&gt; gsap.to(cam, { z, duration: d, ease: 'power1.inOut' }),
+              truck:    (dx = 3, d = 2.5) =&gt; gsap.to(cam, { x: `+=${dx}`, tx: `+=${dx}`, duration: d, ease: 'power2.inOut' }),
+              pedestal: (dy = 1, d = 2)   =&gt; gsap.to(cam, { y: `+=${dy}`, ty: `+=${dy}`, duration: d }),
+              crane:    (d = 4)           =&gt; gsap.to(cam, { y: 6.5, z: 7.5, ty: 0.8, duration: d, ease: 'power2.inOut' }),
+              roll:     (deg = 360, d = 3.6) =&gt; gsap.to(cam, { roll: `+=${deg}`, duration: d, ease: 'power2.inOut' }),
+            };
+
+            // ترکیب حرکت‌ها مثل یک اپراتور واقعی: Push in + کمی Pan هم‌زمان
+            gsap.timeline().add(Moves.pushIn(2, 3)).add(Moves.pan(0.4, 3), '&lt;');
+          </code></pre>
+          <pre data-title="Arc / Orbit"><code class="language-javascript">
+            const orbit = { a: 0 };
+            gsap.to(orbit, {
+              a: Math.PI * 1.6, duration: 5, ease: 'power1.inOut',
+              onUpdate() {
+                cam.x = target.x + Math.sin(orbit.a) * R;
+                cam.z = target.z + Math.cos(orbit.a) * R;
+              },
+            });
+            // یا برای ۳۶۰ محصول: OrbitControls با autoRotate = true و autoRotateSpeed
+          </code></pre>
+          <pre data-title="Dolly Zoom"><code class="language-javascript">
+            // Vertigo: اندازه‌ی سوژه ثابت، پس‌زمینه کش می‌آید
+            const H = 1.2; // ارتفاعی از سوژه که باید ثابت بماند (متر)
+            gsap.to(cam, {
+              focal: 110, duration: 4, ease: 'power1.inOut',
+              onUpdate() {
+                camera.setFocalLength(cam.focal);
+                const d = (H / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+                cam.z = subject.position.z + d;
+              },
+            });
+          </code></pre>
+          <pre data-title="ScrollTrigger"><code class="language-javascript">
+            // هر سکشن صفحه = یک «نما»؛ اسکرول = دست اپراتور
+            const shots = [
+              { el: '#s1', cam: { x: 0, y: 6, z: 14, ty: 0.5 } },        // Crane establishing
+              { el: '#s2', cam: { x: 0, y: 1.6, z: 3.5, ty: 1.4 } },     // Push in
+              { el: '#s3', cam: { x: 2.5, tx: 2.5 } },                   // Truck
+              { el: '#s4', cam: { focal: 85, z: 2 } },                   // لنز بلندتر + نزدیک‌تر
+            ];
+            shots.forEach(({ el, cam: to }) =&gt; {
+              gsap.to(cam, { ...to, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'top top', scrub: 1 } });
+            });
+          </code></pre>
+          <pre data-title="Easing = Operator feel"><code class="language-javascript">
+            // ease همان «دست» اپراتور است
+            'none'          // ماشینی — موتورکنترل، تایم‌لپس، تراکینگ هم‌سرعت با سوژه
+            'power1.inOut'  // اپراتور نرم — دالی کلاسیک
+            'power3.inOut'  // سینمایی و دراماتیک — شروع و توقف آرام، وسط سریع
+            'power4.in'     // شتاب انفجاری — ابتدای Whip pan
+            'expo.out'      // توقف ناگهانی و نرم — رسیدن به CU
+            'sine.inOut'    // تنفس — حرکت‌های تکرارشونده (yoyo)
+            CustomEase.create('crane', 'M0,0 C0.4,0 0.2,1 1,1') // منحنی دلخواه
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 قانون طلایی:</b> حرکت را «انگیزه‌دار» کنید. Push in وقتی شخصیت چیزی می‌فهمد، Pan وقتی صدایی از کنار می‌آید، Crane up وقتی صحنه تمام می‌شود.
+          در UI هم: حرکت دوربین باید یا اطلاعات تازه آشکار کند، یا به کاربر بگوید کجا هست. حرکت بی‌دلیل = تهوع و حواس‌پرتی.
+        </div>
+      </section>
+
+      <!-- ===================== 07 LENSES ===================== -->
+      <section id="lenses" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 07 · CAMERA LENSES</span>
+          <h2>لنزها و فاصله‌ی کانونی <small>Camera Lenses</small></h2>
+          <p class="lead">
+            فاصله‌ی کانونی (mm) زاویه‌ی دید را تعیین می‌کند؛ اما نکته‌ی کلیدی این است: <b>پرسپکتیو (نسبت اندازه‌ی جلو و عقب) را فاصله‌ی دوربین می‌سازد، نه لنز</b>.
+            لنز واید «مجبورتان می‌کند» نزدیک بروید، پس پرسپکتیو اغراق می‌شود؛ تله «مجبورتان می‌کند» دور بایستید، پس لایه‌ها فشرده می‌شوند (Compression).
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>کنترل زاویه‌ی دید، پرسپکتیو، اعوجاج، فشردگی لایه‌ها و «امضای» بصری تصویر.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>انتخاب <code>fov</code> درست برای سین (بیشتر اوقات ۳۰ تا ۴۵ درجه)، دوربین بازی، افکت‌های فیش‌آی و آنامورفیک.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>camera.setFocalLength()</code>، <code>filmGauge</code>، <code>fov</code>، شیدر اعوجاج، Letterbox با CSS، <code>OrthographicCamera</code> (لنز بی‌نهایت).</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>لنز</th><th>FOV افقی (فول‌فریم)</th><th>ویژگی</th><th>کاربرد / معادل</th></tr></thead>
+            <tbody>
+              <tr><td>فیش‌آی<span class="en-term">Fisheye 8–16mm</span></td><td>۱۸۰°</td><td>اعوجاج بشکه‌ای عمدی</td><td>شیدر Barrel distortion</td></tr>
+              <tr><td>فوق واید<span class="en-term">Ultra Wide 14mm</span></td><td>~۱۰۴°</td><td>اغراق فاصله‌ها، کشیدگی لبه</td><td>فضای تنگ، معماری</td></tr>
+              <tr><td>واید<span class="en-term">Wide 24mm</span></td><td>~۷۴°</td><td>محیطی، عمق زیاد</td><td>Establishing، بازی سوم‌شخص</td></tr>
+              <tr><td>استاندارد<span class="en-term">35mm</span></td><td>~۵۴°</td><td>داستان‌گو</td><td>پیش‌فرض خوب سین وب</td></tr>
+              <tr><td>نرمال<span class="en-term">50mm</span></td><td>~۴۰°</td><td>نزدیک به چشم انسان</td><td>محصول بدون دفرمگی</td></tr>
+              <tr><td>پرتره<span class="en-term">85mm</span></td><td>~۲۴°</td><td>چهره‌ی خوش‌فرم، جداسازی</td><td>CU کاراکتر، هیروی محصول</td></tr>
+              <tr><td>تله<span class="en-term">135–200mm+</span></td><td>~۱۵° تا ۱۰°</td><td>فشردگی شدید</td><td>حس تخت/پوستری؛ نزدیک به Ortho</td></tr>
+              <tr><td>ماکرو<span class="en-term">Macro</span></td><td>—</td><td>فوکوس خیلی نزدیک، بزرگ‌نمایی ۱:۱</td><td>ECU محصول، near plane کوچک</td></tr>
+              <tr><td>آنامورفیک<span class="en-term">Anamorphic</span></td><td>2.39:1</td><td>بوکه‌ی بیضی، فلر افقی</td><td>Letterbox، Bloom کشیده</td></tr>
+              <tr><td>تیلت‌شیفت<span class="en-term">Tilt-Shift</span></td><td>—</td><td>شیفت کادر / صفحه‌ی فوکوس کج</td><td><code>setViewOffset</code>، افکت مینیاتوری</td></tr>
+              <tr><td>پرایم در برابر زوم<span class="en-term">Prime vs Zoom</span></td><td>—</td><td>ثابت و تیز / متغیر و منعطف</td><td>fov ثابت در برابر tween روی fov</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="lenses"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Focal length"><code class="language-javascript">
+            // Three.js به‌صورت پیش‌فرض با fov عمودی کار می‌کند؛ با filmGauge می‌توانید «میلی‌متری» فکر کنید
+            camera.filmGauge = 36;           // عرض سنسور فول‌فریم
+            camera.setFocalLength(50);       // ⇒ camera.fov به‌طور خودکار
+            camera.getFocalLength();         // ⇐ برعکس
+
+            // Super 35 (سینما دیجیتال) ≈ 24.9mm ⇒ همان لنز «تله‌تر» دیده می‌شود (Crop factor)
+            camera.filmGauge = 24.9;
+
+            // چرا fov عمودی؟ وقتی پنجره پهن‌تر می‌شود، ارتفاع کادر ثابت و دید افقی بیشتر می‌شود.
+            // برای موبایل عمودی شاید بخواهید fov افقی را ثابت نگه دارید:
+            function setHorizontalFov(camera, hfovDeg) {
+              const h = THREE.MathUtils.degToRad(hfovDeg);
+              camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(h / 2) / camera.aspect));
+              camera.updateProjectionMatrix();
+            }
+          </code></pre>
+          <pre data-title="Compression demo"><code class="language-javascript">
+            // ثابت نگه داشتن اندازه‌ی سوژه با هر لنز ⇒ تفاوت فقط در پرسپکتیو پس‌زمینه
+            function setLensKeepSubject(focal, subjectHeight = 1.25) {
+              camera.setFocalLength(focal);
+              const d = (subjectHeight / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+              camera.position.z = subject.position.z + d;
+            }
+            setLensKeepSubject(14);   // دوربین ~0.9m ⇒ ستون‌ها دور و کوچک
+            setLensKeepSubject(200);  // دوربین ~12m  ⇒ ستون‌ها بزرگ و چسبیده به سوژه
+          </code></pre>
+          <pre data-title="GLSL — Fisheye"><code class="language-glsl">
+            // ShaderPass: اعوجاج بشکه‌ای + وینیت
+            uniform sampler2D tDiffuse;
+            uniform float strength;   // 0 = rectilinear ، 0.4 ≈ فیش‌آی
+            uniform float aspect;
+            varying vec2 vUv;
+            void main() {
+              vec2 p = vUv * 2.0 - 1.0;
+              p.x *= aspect;
+              vec2 q = p * (1.0 + strength * dot(p, p));
+              q.x /= aspect;
+              vec2 uv = q * 0.5 + 0.5;
+              if (any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0)))) { gl_FragColor = vec4(0.0); return; }
+              gl_FragColor = texture2D(tDiffuse, uv);
+            }
+          </code></pre>
+          <pre data-title="Anamorphic (CSS + Bloom)"><code class="language-css">
+            /* Letterbox 2.39:1 داخل کادر 16:9 ⇒ هر نوار (1 − (16/9)/2.39) / 2 ≈ 12.8% */
+            .stage::before, .stage::after {
+              content: ""; position: absolute; inset-inline: 0; height: 12.8%; background: #000; z-index: 2;
+            }
+            .stage::before { top: 0; }  .stage::after { bottom: 0; }
+
+            /* در Three.js: فلر افقی آبی با UnrealBloomPass روی لایه‌ی نورها و scale افقی،
+               و بوکه‌ی بیضی با کشیدن کرنل بلور: dofblur * vec2(0.5, 1.0) */
+          </code></pre>
+          <pre data-title="Orthographic = ∞mm"><code class="language-javascript">
+            // تله‌ی بی‌نهایت = بدون پرسپکتیو. برای حس ایزومتریک/گرافیکی
+            const frustum = 4;
+            const ortho = new THREE.OrthographicCamera(
+              -frustum * aspect / 2, frustum * aspect / 2, frustum / 2, -frustum / 2, 0.1, 100
+            );
+            // «زوم» در Ortho = ortho.zoom (نه فاصله)
+            gsap.to(ortho, { zoom: 2, onUpdate: () =&gt; ortho.updateProjectionMatrix() });
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 انتخاب fov برای وب:</b> بیشتر سین‌های محصول با ۳۵ تا ۵۰ میلی‌متر (fov عمودی ۲۰ تا ۳۰ درجه) بهتر دیده می‌شوند؛ پیش‌فرض ۷۵ درجه‌ی بسیاری از مثال‌ها
+          معادل لنز ~۱۳ میلی‌متر روی ۱۶:۹ است — یعنی فوق‌واید! به همین دلیل خیلی از سین‌های آماتوری «کشیده» و غیرسینمایی به نظر می‌رسند.
+        </div>
+      </section>
+
+      <!-- ===================== 08 FRAME RATE ===================== -->
+      <section id="framerate" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 08 · FRAME RATE &amp; SHUTTER</span>
+          <h2>فریم‌ریت و شاتر <small>Frame Rate</small></h2>
+          <p class="lead">
+            فریم‌ریت دو معنا دارد: <b>فریم‌ریت ضبط</b> (چند تصویر در ثانیه گرفته می‌شود) و <b>فریم‌ریت پخش</b>. تفاوت این دو، سرعت زمان را می‌سازد
+            (اسلوموشن یا تایم‌لپس). <b>زاویه‌ی شاتر</b> تعیین می‌کند هر فریم چه مدت نور بگیرد و در نتیجه چقدر موشن‌بلور داشته باشد. قانون ۱۸۰ درجه: سرعت شاتر = ۱ / (۲ × فریم‌ریت).
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>کنترل حس حرکت (روان/بریده‌بریده)، سرعت زمان (کند/تند) و «حس سینمایی» در برابر «حس ویدیویی».</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>انیمیشن‌های مستقل از فریم‌ریت، اسلوموشن در لحظه‌ی اوج (bullet time)، انیمیشن stepped (حس استاپ‌موشن)، موشن‌بلور.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p><code>deltaTime</code>، Fixed timestep، <code>gsap.globalTimeline.timeScale()</code>، <code>ease: 'steps(n)'</code>، <code>gsap.ticker.fps()</code>، Accumulation / Velocity blur.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>مفهوم</th><th>مقدار</th><th>حس / کاربرد</th><th>در کد</th></tr></thead>
+            <tbody>
+              <tr><td>سینما<span class="en-term">24 fps</span></td><td>۲۴ با شاتر ۱۸۰°</td><td>«سینمایی»، کمی موشن‌بلور</td><td>ease: <code>steps</code> برای حس ۲۴</td></tr>
+              <tr><td>تلویزیون/وب<span class="en-term">25 / 30 fps</span></td><td>PAL / NTSC</td><td>واقعی‌تر، ویدیویی</td><td>—</td></tr>
+              <tr><td>HFR<span class="en-term">48 / 60 fps</span></td><td>نرم و تیز</td><td>ورزش، گیم، «سوپ اپرا»</td><td>rAF استاندارد ۶۰/۱۲۰Hz</td></tr>
+              <tr><td>اسلوموشن<span class="en-term">Overcranking</span></td><td>۱۲۰ ضبط ← ۲۴ پخش</td><td>تأکید، زیبایی، جزئیات</td><td><code>timeScale(0.2)</code></td></tr>
+              <tr><td>تایم‌لپس<span class="en-term">Undercranking</span></td><td>۶ ضبط ← ۲۴ پخش</td><td>گذر زمان، کمدی صامت</td><td><code>timeScale(4)</code></td></tr>
+              <tr><td>شاتر باریک<span class="en-term">45°–90°</span></td><td>نوردهی کوتاه</td><td>بریده‌بریده، جنگ، اضطراب</td><td>بدون موشن‌بلور</td></tr>
+              <tr><td>شاتر باز<span class="en-term">270°–360°</span></td><td>نوردهی طولانی</td><td>رؤیایی، کشیده</td><td>موشن‌بلور زیاد</td></tr>
+              <tr><td>اثر واگن‌ویل<span class="en-term">Wagon-wheel</span></td><td>Aliasing زمانی</td><td>چرخ ثابت یا وارونه</td><td>نمونه‌برداری گسسته</td></tr>
+              <tr><td>رمپ سرعت<span class="en-term">Speed Ramp</span></td><td>تغییر سرعت در نما</td><td>اکشن مدرن (Matrix, 300)</td><td>tween روی <code>timeScale</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="framerate"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="Delta time"><code class="language-javascript">
+            // ❌ وابسته به فریم‌ریت: روی مانیتور ۱۲۰Hz دو برابر سریع‌تر!
+            mesh.rotation.y += 0.02;
+
+            // ✅ مستقل از فریم‌ریت: سرعت بر حسب «واحد بر ثانیه»
+            const clock = new THREE.Clock();
+            renderer.setAnimationLoop(() =&gt; {
+              const dt = Math.min(clock.getDelta(), 1 / 20);   // سقف برای وقتی تب پس‌زمینه بوده
+              mesh.rotation.y += 1.2 * dt;                     // 1.2 رادیان بر ثانیه
+            });
+          </code></pre>
+          <pre data-title="Slow-mo / Speed ramp"><code class="language-javascript">
+            // کل زمان GSAP را کند کن (Overcranking) — همه‌ی tweenها و timelineها
+            gsap.globalTimeline.timeScale(0.2);       // ×5 آهسته‌تر
+
+            // Speed ramp: تند ← خیلی کند ← تند (Bullet time)
+            const time = { scale: 1 };
+            gsap.timeline({ onUpdate: () =&gt; actionTimeline.timeScale(time.scale) })
+              .to(time, { scale: 0.08, duration: 0.4, ease: 'power2.out' })
+              .to(time, { scale: 1, duration: 0.8, ease: 'power2.in' }, '+=1.5');
+
+            // برای فیزیک/Three.js: به‌جای dt از dt * timeScale استفاده کنید
+            world.step(1 / 60, dt * time.scale);
+          </code></pre>
+          <pre data-title="Stepped (on twos)"><code class="language-javascript">
+            // انیمیشن «روی دوتایی‌ها» (۱۲fps) مثل انیمه یا استاپ‌موشن (Spider-Verse)
+            gsap.to('.character', { x: 400, duration: 2, ease: 'steps(24)' });
+
+            // یا محدود کردن نرخ رندر یک سین سه‌بعدی به ۱۲fps بدون کند کردن زمان:
+            let acc = 0; const STEP = 1 / 12;
+            renderer.setAnimationLoop(() =&gt; {
+              acc += clock.getDelta();
+              if (acc &lt; STEP) return;
+              update(acc); acc = 0;           // زمان واقعی حفظ می‌شود، فقط نمونه‌برداری کم است
+              renderer.render(scene, camera);
+            });
+
+            // GSAP: محدود کردن fps کل تیکر
+            gsap.ticker.fps(24);
+          </code></pre>
+          <pre data-title="Fixed timestep"><code class="language-javascript">
+            // الگوی «Fix Your Timestep»: شبیه‌سازی با گام ثابت، رندر با هر نرخی
+            const STEP = 1 / 60;
+            let acc = 0;
+            renderer.setAnimationLoop(() =&gt; {
+              acc += Math.min(clock.getDelta(), 0.25);
+              while (acc &gt;= STEP) { simulate(STEP); acc -= STEP; }
+              const alpha = acc / STEP;             // درون‌یابی بین دو حالت برای نرمی
+              interpolateVisuals(alpha);
+              renderer.render(scene, camera);
+            });
+          </code></pre>
+          <pre data-title="Motion blur (shutter)"><code class="language-javascript">
+            // شبیه‌سازی شاتر: میانگین N زیرفریم در بازه‌ی باز بودن شاتر (Accumulation)
+            const exposure = (shutterAngle / 360) / fps;   // 180° @ 24fps ⇒ 1/48s
+            for (let i = 0; i &lt; N; i++) {
+              drawScene(off, frameTime + exposure * i / (N - 1));
+              ctx.globalAlpha = 1 / (i + 1);   // میانگین متحرک
+              ctx.drawImage(off, 0, 0);
+            }
+            // در Three.js real-time: Velocity buffer + blur جهت‌دار (مثل MotionBlurPass)
+            // یا «afterimage» ارزان: AfterimagePass با damp ≈ 0.8
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 چرا ۲۴fps در فیلم نرم است ولی در بازی لگ؟</b> چون هر فریم فیلم ۱/۴۸ ثانیه نوردهی دارد و حرکت درون فریم «بلور» شده است؛ مغز این بلور را به هم وصل می‌کند.
+          رندر real-time لحظه‌ای است (شاتر ≈ ۰°)، پس ۲۴ تصویر تیز و جدا می‌بینیم. اگر عمداً فریم‌ریت پایین می‌خواهید (حس استایلیزه)، آن را در <b>زمان‌بندی انیمیشن</b> اعمال کنید، نه با کند کردن کل رندر.
+        </div>
+      </section>
+
+      <!-- ===================== 09 TRANSITIONS ===================== -->
+      <section id="transitions" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 09 · TRANSITIONS</span>
+          <h2>ترنزیشن‌ها <small>Film Transitions</small></h2>
+          <p class="lead">
+            ترنزیشن روش اتصال دو نما است و خودش معنا دارد: <b>کات</b> نامرئی است، <b>دیزالو</b> یعنی گذر زمان یا ارتباط، <b>فید</b> یعنی پایان فصل، <b>مچ کات</b> یعنی «این دو چیز به هم مربوط‌اند».
+            در وب، ترنزیشن‌ها هر روز استفاده می‌شوند: تغییر صفحه، اسلایدر، مودال، تغییر تم.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>حفظ پیوستگی ذهنی، ساختن ریتم، القای زمان یا مکان جدید، و ارتباط معنایی بین دو تصویر.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>Page transitions (Barba.js، View Transitions)، اسلایدرهای WebGL، Shared element (FLIP)، صدای پیوسته بین صفحات.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p>GSAP + <code>opacity</code>/<code>clip-path</code>/<code>filter</code>، Fragment shader با <code>progress</code>، <code>document.startViewTransition()</code>، Web Audio.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ترنزیشن</th><th>چطور</th><th>معنا / حس</th><th>معادل وب</th></tr></thead>
+            <tbody>
+              <tr><td>کات<span class="en-term">Cut</span></td><td>آنی</td><td>نامرئی، پیوستگی</td><td><code>gsap.set</code> / تعویض state</td></tr>
+              <tr><td>دیزالو<span class="en-term">Cross Dissolve</span></td><td>محو هم‌زمان</td><td>گذر زمان، خاطره</td><td><code>opacity</code></td></tr>
+              <tr><td>فید<span class="en-term">Fade to/from Black</span></td><td>به سیاه و از سیاه</td><td>پایان فصل</td><td>overlay + تعویض در تاریکی</td></tr>
+              <tr><td>وایپ<span class="en-term">Wipe</span></td><td>لبه‌ی متحرک</td><td>بازیگوش، آگاهانه</td><td><code>clip-path: inset()</code></td></tr>
+              <tr><td>آیریس<span class="en-term">Iris</span></td><td>دایره‌ی باز/بسته</td><td>نوستالژی، تمرکز</td><td><code>clip-path: circle()</code></td></tr>
+              <tr><td>ویپ پن<span class="en-term">Whip Pan</span></td><td>پن سریع با بلور</td><td>انرژی</td><td><code>xPercent</code> + <code>blur</code></td></tr>
+              <tr><td>مچ کات<span class="en-term">Match Cut</span></td><td>شکل/حرکت مشترک</td><td>ارتباط معنایی</td><td>Shared element / FLIP</td></tr>
+              <tr><td>جامپ کات<span class="en-term">Jump Cut</span></td><td>همان نما، زمان دیگر</td><td>بی‌قراری، فشرده‌سازی</td><td>تعویض آنی فریم‌ها</td></tr>
+              <tr><td>اسمش کات<span class="en-term">Smash Cut</span></td><td>کات به تضاد شدید</td><td>شوک، کمدی</td><td>flash + shake</td></tr>
+              <tr><td>جی کات / ال کات<span class="en-term">J-Cut / L-Cut</span></td><td>صدا جلوتر/عقب‌تر از تصویر</td><td>طبیعی، پیوسته</td><td>Web Audio زمان‌بندی‌شده</td></tr>
+              <tr><td>ترنزیشن نامرئی<span class="en-term">Invisible / Hidden Cut</span></td><td>پنهان پشت تاریکی/حرکت</td><td>نمای «یک‌برداشت»</td><td>تعویض سین پشت یک شیء/ویپ</td></tr>
+              <tr><td>مورف<span class="en-term">Morph</span></td><td>تبدیل یک شکل به دیگری</td><td>دگرگونی</td><td>MorphSVG، morph targets، shader</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo" data-demo="transitions"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="GSAP — Classic"><code class="language-javascript">
+            // ساختار: B زیر A ؛ ترنزیشن = از بین بردن A
+            const T = {
+              cut:      (A) =&gt; gsap.set(A, { autoAlpha: 0 }),
+              dissolve: (A) =&gt; gsap.to(A, { autoAlpha: 0, duration: 1.4, ease: 'none' }),
+              wipe:     (A) =&gt; gsap.to(A, { clipPath: 'inset(0% 0% 0% 100%)', duration: 1, ease: 'power2.inOut' }),
+              iris:     (A, B, x = '50%', y = '50%') =&gt;
+                gsap.fromTo(B, { clipPath: `circle(0% at ${x} ${y})`, zIndex: 3 },
+                               { clipPath: `circle(120% at ${x} ${y})`, duration: 1.4, ease: 'power2.in' }),
+              dip: (A, swap) =&gt; gsap.timeline()
+                .to('.black', { autoAlpha: 1, duration: 0.8 })
+                .call(swap)
+                .to('.black', { autoAlpha: 0, duration: 0.8 }, '+=0.3'),
+            };
+            // آیریس از محل کلیک کاربر:
+            button.onclick = (e) =&gt; T.iris(A, B, `${e.clientX}px`, `${e.clientY}px`);
+          </code></pre>
+          <pre data-title="View Transitions API"><code class="language-javascript">
+            // ترنزیشن بومی مرورگر بین دو حالت DOM (یا دو صفحه در MPA)
+            async function go(url) {
+              if (!document.startViewTransition) return render(url);   // fallback = کات
+              const vt = document.startViewTransition(() =&gt; render(url));
+              await vt.finished;
+            }
+
+            /* CSS */
+            /* ::view-transition-old(root) { animation: fade-out .4s ease both; }
+               ::view-transition-new(root) { animation: iris-in .9s cubic-bezier(.6,0,.3,1) both; }
+               .product-image { view-transition-name: hero-image; }   ← Match cut خودکار (Shared element)
+               @keyframes iris-in { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(120%); } }
+               @view-transition { navigation: auto; }                  ← برای ترنزیشن بین صفحات MPA */
+          </code></pre>
+          <pre data-title="GLSL — Shader transitions"><code class="language-glsl">
+            uniform sampler2D tA, tB;
+            uniform float progress;   // 0 → 1 با GSAP
+            varying vec2 vUv;
+
+            // Burn dissolve
+            float n = fbm(vUv * 3.5);
+            float edge = progress * 1.3 - 0.15;
+            float m = smoothstep(edge - 0.015, edge + 0.015, n);
+            vec3 col = mix(texture2D(tB, vUv).rgb, texture2D(tA, vUv).rgb, m);
+            col += vec3(1.0, 0.45, 0.1) * smoothstep(0.05, 0.0, abs(n - edge));
+
+            // Directional wipe با لبه‌ی نرم
+            // float w = smoothstep(progress - 0.05, progress + 0.05, vUv.x);  col = mix(B, A, w);
+
+            // Zoom blur / Ripple / Pixelate … مجموعه‌ی آماده: gl-transitions.com
+          </code></pre>
+          <pre data-title="Match cut / FLIP"><code class="language-javascript">
+            import { Flip } from 'gsap/Flip';
+            gsap.registerPlugin(Flip);
+
+            // Match cut در UI: یک عنصر مشترک (thumbnail ← هیروی صفحه‌ی جزئیات)
+            const state = Flip.getState('.thumb');          // «فریم آخر نمای A»
+            detail.append(document.querySelector('.thumb'));  // تغییر چیدمان (نمای B)
+            Flip.from(state, { duration: 0.8, ease: 'power3.inOut', absolute: true });
+          </code></pre>
+          <pre data-title="J-Cut / L-Cut (Web Audio)"><code class="language-javascript">
+            const ac = new AudioContext();
+            const t0 = ac.currentTime;
+
+            // J-Cut: صدای B «قبل از» تصویر B شروع می‌شود
+            playAmbience(sceneA, t0, t0 + 1.4);
+            playAmbience(sceneB, t0 + 1.4, t0 + 6);
+            gsap.delayedCall(2.4, () =&gt; showScene(B));
+
+            // L-Cut: تصویر جلو می‌رود، صدای A ادامه دارد
+            gsap.delayedCall(1.4, () =&gt; showScene(B));
+            playAmbience(sceneA, t0, t0 + 2.6);
+
+            // کراس‌فید صدا با GainNode:
+            gainA.gain.linearRampToValueAtTime(0, t0 + 1.4);
+            gainB.gain.linearRampToValueAtTime(1, t0 + 1.4);
+          </code></pre>
+        </div>
+        <div class="callout warn">
+          <b>⚠️ اشتباه رایج</b> استفاده از ترنزیشن‌های پرزرق‌وبرق (وایپ ستاره‌ای، چرخش ۳بعدی) برای هر تغییر کوچک. در سینما ۹۰٪ ترنزیشن‌ها <b>کات</b> هستند.
+          ترنزیشن خاص را برای تغییرهای معنادار نگه دارید (ورود به بخش جدید، تغییر زمان/مکان) و همیشه به <code>prefers-reduced-motion</code> احترام بگذارید.
+        </div>
+      </section>
+
+      <!-- ===================== 10 EDITING ===================== -->
+      <section id="editing" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">EPISODE 10 · EDITING TECHNIQUES</span>
+          <h2>تکنیک‌های تدوین <small>Editing</small></h2>
+          <p class="lead">
+            تدوین یعنی <b>انتخاب، ترتیب و زمان‌بندی</b> نماها. قواعد «تدوین تداومی» (۱۸۰ درجه، ۳۰ درجه، کات روی حرکت، تطبیق نگاه) جغرافیا را در ذهن مخاطب حفظ می‌کنند؛
+            و تکنیک‌های «مونتاژ» (کولشوف، برش موازی، مونتاژ) از کنار هم گذاشتن نماها <b>معنای جدید</b> می‌سازند. در کد، تدوین همان <b>داده + timeline</b> است.
+          </p>
+        </div>
+
+        <div class="cards">
+          <div class="card goal"><div class="icon">🎯</div><h4>هدف</h4><p>حفظ پیوستگی فضا و زمان، کنترل ریتم و تعلیق، و ساختن معنا از ترتیب تصاویر.</p></div>
+          <div class="card use"><div class="icon">🧩</div><h4>کاربرد در کریتیو</h4><p>سیستم دوربین دیالوگ در بازی، اسکرول‌تلینگ با چند «نما»، کاروسل و استوری، ترتیب محتوای لندینگ.</p></div>
+          <div class="card code"><div class="icon">⌨️</div><h4>معادل کد</h4><p>EDL به‌صورت آرایه، <code>gsap.timeline()</code> با labels، State machine صحنه، بررسی خودکار سمت محور ۱۸۰ با ضرب خارجی.</p></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>تکنیک</th><th>تعریف</th><th>اثر</th><th>معادل در کد / UI</th></tr></thead>
+            <tbody>
+              <tr><td>قانون ۱۸۰ درجه<span class="en-term">180° Rule</span></td><td>دوربین‌ها یک سمت محور دو بازیگر</td><td>جهت نگاه‌ها ثابت</td><td>ضرب خارجی برای تعیین سمت</td></tr>
+              <tr><td>قانون ۳۰ درجه<span class="en-term">30° Rule</span></td><td>نماهای پشت‌سرهم ≥ ۳۰° اختلاف</td><td>جلوگیری از جامپ ناخواسته</td><td>چک زاویه بین دو state</td></tr>
+              <tr><td>نما / نمای معکوس<span class="en-term">Shot / Reverse Shot</span></td><td>OTS یک‌درمیان</td><td>الگوی دیالوگ</td><td>سوییچ دوربین روی گوینده</td></tr>
+              <tr><td>تطبیق نگاه<span class="en-term">Eyeline Match</span></td><td>نگاه شخصیت ← آنچه می‌بیند</td><td>ارتباط علّی</td><td>جهت نگاه کاراکتر ← CTA</td></tr>
+              <tr><td>کات روی حرکت<span class="en-term">Cutting on Action</span></td><td>کات وسط حرکت</td><td>کات نامرئی</td><td>تعویض state وسط انیمیشن</td></tr>
+              <tr><td>کات‌اوی<span class="en-term">Cutaway</span></td><td>نمای فرعی و بازگشت</td><td>اطلاعات اضافه، پوشاندن پرش</td><td>Loader/انیمیشن فرعی</td></tr>
+              <tr><td>برش موازی<span class="en-term">Cross-cutting</span></td><td>دو رویداد هم‌زمان یک‌درمیان</td><td>تعلیق</td><td>timeline با مدت‌های کاهشی</td></tr>
+              <tr><td>مونتاژ<span class="en-term">Montage</span></td><td>نماهای کوتاه پشت هم</td><td>فشرده‌سازی زمان</td><td>stagger، استوری</td></tr>
+              <tr><td>اثر کولشوف<span class="en-term">Kuleshov Effect</span></td><td>معنا از کنار هم گذاشتن</td><td>احساس «القا»شده</td><td>ترتیب محتوا = پیام</td></tr>
+              <tr><td>ریتم و پیس<span class="en-term">Pacing</span></td><td>طول نماها</td><td>کوتاه = هیجان، بلند = تأمل</td><td>duration و ease روی EDL</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>دمو ۱: قانون ۱۸۰ و ۳۰ درجه</h4>
+        <div class="demo" data-demo="editing-180"></div>
+        <h4>دمو ۲: EDL ← GSAP Timeline</h4>
+        <div class="demo" data-demo="editing-edl"></div>
+
+        <h3>معادل در کد</h3>
+        <div class="code-tabs">
+          <pre data-title="EDL → Timeline"><code class="language-javascript">
+            // Edit Decision List: «تدوین» به‌صورت داده — قابل ذخیره، نسخه‌بندی و ویرایش توسط غیربرنامه‌نویس
+            const EDL = [
+              { shot: 'wide',  dur: 2.0, label: 'establish' },
+              { shot: 'otsB',  dur: 1.5, speaker: 'B' },
+              { shot: 'otsA',  dur: 1.5, speaker: 'A' },
+              { shot: 'cuA',   dur: 2.2, speaker: 'A', transition: 'dissolve' },
+            ];
+
+            function buildEdit(edl) {
+              const tl = gsap.timeline();
+              let t = 0;
+              for (const clip of edl) {
+                tl.addLabel(clip.label ?? clip.shot, t);
+                if (clip.transition === 'dissolve') tl.add(dissolveTo(SHOTS[clip.shot]), t);
+                else tl.call(() =&gt; cutTo(SHOTS[clip.shot]), null, t);   // کات = call در یک لحظه
+                t += clip.dur;
+              }
+              return tl;
+            }
+            const edit = buildEdit(EDL);
+            edit.timeScale(1.25);          // ریتم کل تدوین
+            edit.seek('establish');        // پرش به یک نما (مثل مارکر در Premiere)
+          </code></pre>
+          <pre data-title="180° check"><code class="language-javascript">
+            // سمت دوربین نسبت به محور A→B (ضرب خارجی دوبعدی روی صفحه‌ی XZ)
+            function sideOfAxis(A, B, camPos) {
+              const ax = B.x - A.x, az = B.z - A.z;
+              const cx = camPos.x - A.x, cz = camPos.z - A.z;
+              return Math.sign(ax * cz - az * cx);   // +1 یا -1
+            }
+            const allowed = sideOfAxis(A.position, B.position, wideShot.position);
+            function safeCut(state) {
+              if (sideOfAxis(A.position, B.position, state) !== allowed) {
+                console.warn('⚠ Crossing the line — جهت نگاه‌ها برعکس می‌شود');
+              }
+              cutTo(state);
+            }
+          </code></pre>
+          <pre data-title="Dialogue camera (game)"><code class="language-javascript">
+            // State machine ساده: دوربین روی گوینده کات می‌شود، با رعایت ۳۰° و ۱۸۰°
+            const DialogueCam = {
+              current: null,
+              onLine(speaker, listener) {
+                const next = overShoulder(listener, speaker, +1);   // همیشه یک سمت محور
+                if (this.current &amp;&amp; angleBetween(this.current, next) &lt; 30) {
+                  next.focal = this.current.focal &gt; 40 ? 35 : 60;   // اگر زاویه کم است، اندازه نما را عوض کن
+                }
+                cutTo(next);
+                this.current = next;
+              },
+            };
+          </code></pre>
+          <pre data-title="Cross-cutting rhythm"><code class="language-javascript">
+            // ریتم شتاب‌گیرنده: مدت هر نما با یک ease کم می‌شود
+            const N = 12, longest = 1.6, shortest = 0.3;
+            const ease = gsap.parseEase('power2.in');
+            const edl = Array.from({ length: N }, (_, i) =&gt; ({
+              shot: ['train', 'hero', 'rails'][i % 3],
+              dur: longest - (longest - shortest) * ease(i / (N - 1)),
+            }));
+          </code></pre>
+          <pre data-title="Cut on action"><code class="language-javascript">
+            // تعویض صفحه دقیقاً «وسط» حرکت کلیک، نه بعد از آن ⇒ کات نامرئی
+            gsap.timeline()
+              .to(card, { scale: 1.08, y: -20, duration: 0.25, ease: 'power2.in' })   // شروع حرکت در نمای A
+              .call(() =&gt; router.push('/detail'))                                    // کات وسط حرکت
+              .from('.detail-hero', { scale: 0.92, y: 20, duration: 0.45, ease: 'power3.out' }); // ادامه در نمای B
+          </code></pre>
+        </div>
+      </section>
+
+      <!-- ===================== SHOT LIST AS DATA ===================== -->
+      <section id="shotlist-code" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">★ · PUTTING IT TOGETHER</span>
+          <h2>شات‌لیست به‌عنوان داده <small>Shot List → Code</small></h2>
+          <p class="lead">
+            اسم سری «The Shot List» از سندی می‌آید که فیلم‌سازها قبل از فیلم‌برداری می‌نویسند: جدولی از همه‌ی نماها با اندازه، زاویه، حرکت، لنز و توضیح.
+            برای یک کریتیو دولوپر، شات‌لیست یعنی یک <b>آرایه‌ی JSON</b> که موتور صحنه آن را اجرا می‌کند. هر ستون شات‌لیست StudioBinder یک پارامتر کد است.
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ستون شات‌لیست</th><th>مثال</th><th>فیلد در کد</th></tr></thead>
+            <tbody>
+              <tr><td>Shot #</td><td>1A</td><td><code>id</code></td></tr>
+              <tr><td>Shot Size</td><td>MCU</td><td><code>size → frameSubject()</code></td></tr>
+              <tr><td>Angle</td><td>Low</td><td><code>angle → elevation</code></td></tr>
+              <tr><td>Movement</td><td>Push In</td><td><code>move → Moves.pushIn()</code></td></tr>
+              <tr><td>Equipment</td><td>Steadicam</td><td><code>rig → damping/noise</code></td></tr>
+              <tr><td>Lens</td><td>85mm</td><td><code>focal</code></td></tr>
+              <tr><td>Frame rate</td><td>48fps (slow-mo)</td><td><code>timeScale: 0.5</code></td></tr>
+              <tr><td>Subject / Description</td><td>قهرمان کلید را برمی‌دارد</td><td><code>subject</code>، <code>note</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-tabs">
+          <pre data-title="shotlist.json"><code class="language-javascript">
+            export const SHOT_LIST = [
+              { id: '1',  size: 'EWS', angle: 'birds', move: 'crane-down', rig: 'drone',     focal: 24, dur: 3.0, note: 'Establishing — شهر در شب' },
+              { id: '2',  size: 'WS',  angle: 'eye',   move: 'tracking',   rig: 'steadicam', focal: 28, dur: 2.5, subject: 'hero' },
+              { id: '3',  size: 'MS',  angle: 'low',   move: 'push-in',    rig: 'dolly',     focal: 50, dur: 2.0, subject: 'hero' },
+              { id: '3A', size: 'ECU', angle: 'eye',   move: 'static',     rig: 'tripod',    focal: 100, dur: 1.2, subject: 'key', transition: 'cut', fps: 96 },
+              { id: '4',  size: 'CU',  angle: 'dutch', move: 'handheld',   rig: 'handheld',  focal: 35, dur: 2.0, subject: 'hero', dof: { focus: 'hero', fstop: 1.4 } },
+            ];
+          </code></pre>
+          <pre data-title="director.js"><code class="language-javascript">
+            // «کارگردان»: شات‌لیست را به یک timeline قابل اسکراب تبدیل می‌کند
+            export function direct(shotList, { scrollTrigger } = {}) {
+              const tl = gsap.timeline({ scrollTrigger });
+              for (const s of shotList) {
+                const subject = scene.getObjectByName(s.subject ?? 'hero');
+                const base = {
+                  ...frameSubject(camera, subject, SHOT_SIZES[s.size]),
+                  ...ANGLES[s.angle],
+                  focal: s.focal,
+                  roll: s.angle === 'dutch' ? 15 : 0,
+                };
+                tl.addLabel(s.id);
+                if (s.transition === 'cut' || !tl.duration()) tl.set(cam, base);
+                else tl.to(cam, { ...base, duration: 1, ease: 'power2.inOut' });
+
+                if (MOVES[s.move]) tl.add(MOVES[s.move](s), '&gt;');            // حرکت داخل نما
+                tl.call(() =&gt; setRig(s.rig), null, s.id);                         // رفتار ریگ (damp/noise)
+                if (s.fps) tl.call(() =&gt; gsap.globalTimeline.timeScale(24 / s.fps), null, s.id);
+                if (s.dof) tl.to(bokeh.uniforms.focus, { value: distanceTo(s.dof.focus) }, s.id);
+                tl.to({}, { duration: s.dur });                                    // نگه داشتن نما
+              }
+              return tl;
+            }
+
+            direct(SHOT_LIST, { scrollTrigger: { trigger: '#film', pin: true, scrub: 1, end: '+=6000' } });
+          </code></pre>
+        </div>
+        <div class="callout tip">
+          <b>💡 جریان کار پیشنهادی</b>
+          <ol>
+            <li>قبل از کد، شات‌لیست بنویسید (حتی در یک Google Sheet): هر سکشن صفحه = یک یا چند نما.</li>
+            <li>استوری‌برد سریع بکشید یا با دموهای همین صفحه کادرها را پیدا کنید و مقادیر <code>cam</code> را کپی کنید.</li>
+            <li>شات‌لیست را JSON کنید و با یک تابع <code>direct()</code> اجرا کنید؛ طراح می‌تواند بدون دست زدن به کد نماها را عوض کند.</li>
+            <li>یک «نمای کارگردان» (Debug camera + CameraHelper) نگه دارید تا حرکت‌ها را از بیرون ببینید — مثل inset دموهای این صفحه.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ===================== CHEAT SHEET ===================== -->
+      <section id="cheatsheet" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">≡ · CHEAT SHEET</span>
+          <h2>چیت‌شیت: فیلم ← کد</h2>
+          <p class="lead">خلاصه‌ی سریع برای وقتی وسط کار هستید.</p>
+        </div>
+        <div class="map-grid">
+          <div class="map-item"><span class="film">اندازه نما</span><span class="arrow">←</span><span class="code">d = (h/2)/tan(fov/2)</span></div>
+          <div class="map-item"><span class="film">قانون یک‌سوم</span><span class="arrow">←</span><span class="code">setViewOffset(±W/6)</span></div>
+          <div class="map-item"><span class="film">Low / High angle</span><span class="arrow">←</span><span class="code">cam.y vs eye 1.65</span></div>
+          <div class="map-item"><span class="film">Dutch</span><span class="arrow">←</span><span class="code">lookAt(); rotateZ(θ)</span></div>
+          <div class="map-item"><span class="film">Shallow DOF</span><span class="arrow">←</span><span class="code">BokehPass aperture ↑</span></div>
+          <div class="map-item"><span class="film">Rack focus</span><span class="arrow">←</span><span class="code">gsap.to(focus.value)</span></div>
+          <div class="map-item"><span class="film">Handheld</span><span class="arrow">←</span><span class="code">fbm noise → shake</span></div>
+          <div class="map-item"><span class="film">Steadicam / Gimbal</span><span class="arrow">←</span><span class="code">MathUtils.damp(λ)</span></div>
+          <div class="map-item"><span class="film">Dolly on rails</span><span class="arrow">←</span><span class="code">curve.getPointAt(u)</span></div>
+          <div class="map-item"><span class="film">Pan / Tilt</span><span class="arrow">←</span><span class="code">tween target (tx / ty)</span></div>
+          <div class="map-item"><span class="film">Truck / Pedestal</span><span class="arrow">←</span><span class="code">tween pos + target</span></div>
+          <div class="map-item"><span class="film">Zoom</span><span class="arrow">←</span><span class="code">setFocalLength(mm)</span></div>
+          <div class="map-item"><span class="film">Dolly zoom</span><span class="arrow">←</span><span class="code">focal ↑ + z = d(fov)</span></div>
+          <div class="map-item"><span class="film">Fisheye</span><span class="arrow">←</span><span class="code">barrel distortion pass</span></div>
+          <div class="map-item"><span class="film">Slow motion</span><span class="arrow">←</span><span class="code">timeScale(0.2)</span></div>
+          <div class="map-item"><span class="film">On twos / Stop motion</span><span class="arrow">←</span><span class="code">ease: 'steps(n)'</span></div>
+          <div class="map-item"><span class="film">Cut</span><span class="arrow">←</span><span class="code">gsap.set / tl.call</span></div>
+          <div class="map-item"><span class="film">Dissolve / Wipe / Iris</span><span class="arrow">←</span><span class="code">opacity / clip-path</span></div>
+          <div class="map-item"><span class="film">Match cut</span><span class="arrow">←</span><span class="code">Flip / view-transition-name</span></div>
+          <div class="map-item"><span class="film">J / L cut</span><span class="arrow">←</span><span class="code">AudioContext scheduling</span></div>
+          <div class="map-item"><span class="film">180° rule</span><span class="arrow">←</span><span class="code">sign(cross(axis, toCam))</span></div>
+          <div class="map-item"><span class="film">تدوین</span><span class="arrow">←</span><span class="code">EDL[] → gsap.timeline()</span></div>
+        </div>
+      </section>
+
+      <!-- ===================== SOURCES ===================== -->
+      <section id="sources" class="chapter">
+        <div class="chapter-head">
+          <span class="ep">↗ · SOURCES</span>
+          <h2>منابع و ادامه‌ی یادگیری</h2>
+        </div>
+        <ul class="source-list">
+          <li><a href="https://www.youtube.com/@StudioBinder" target="_blank" rel="noopener">کانال یوتیوب StudioBinder</a> — سری <b>The Shot List</b> (۱۰ قسمت: Shot Sizes, Framing, Angles, Depth of Field, Gear/Rigs, Movement, Lenses, Frame Rate, Transitions, Editing)</li>
+          <li><a href="https://www.classcentral.com/course/youtube-the-shot-list-80162" target="_blank" rel="noopener">The Shot List — Class Central</a> (فهرست قسمت‌ها)</li>
+          <li><a href="https://www.studiobinder.com/tutorials/visualize/" target="_blank" rel="noopener">StudioBinder Academy — Shot List &amp; Storyboard Tutorials</a></li>
+          <li><a href="https://www.studiobinder.com/blog/what-is-a-shot-list-example/" target="_blank" rel="noopener">What is a Shot List? — StudioBinder Blog</a></li>
+          <li><a href="https://threejs.org/docs/#api/en/cameras/PerspectiveCamera" target="_blank" rel="noopener">Three.js — PerspectiveCamera (setFocalLength, filmGauge, setViewOffset)</a></li>
+          <li><a href="https://threejs.org/examples/#webgl_postprocessing_dof" target="_blank" rel="noopener">Three.js — مثال DOF (BokehPass)</a></li>
+          <li><a href="https://gsap.com/docs/v3/" target="_blank" rel="noopener">GSAP Docs</a> — Timeline، ScrollTrigger، Flip، CustomEase</li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API" target="_blank" rel="noopener">MDN — View Transition API</a></li>
+          <li><a href="https://gl-transitions.com/" target="_blank" rel="noopener">gl-transitions</a> — مجموعه‌ی ترنزیشن‌های GLSL</li>
+          <li><a href="https://gafferongames.com/post/fix_your_timestep/" target="_blank" rel="noopener">Fix Your Timestep — Glenn Fiedler</a></li>
+        </ul>
+        <footer>
+          ساخته‌شده با Three.js، GSAP، highlight.js و Vite · این سند یک مرجع آموزشی مستقل است و ارتباط رسمی با StudioBinder ندارد.
+          همه‌ی صحنه‌ها و تصاویر به‌صورت procedural در مرورگر ساخته می‌شوند.
+        </footer>
+      </section>
+
+    </div>
+  </main>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
